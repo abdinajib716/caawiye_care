@@ -1,0 +1,27 @@
+/node_modules
+/public/images/uploads
+/public/hot
+/public/uploads
+# Removed: /public/modules
+/public/storage
+/public/build
+/public/build-*
+/storage/*.key
+/vendor
+.env
+.env.local
+.env.production
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+.DS_Store
+public/.DS_Store
+public/images/.DS_Store
+
+# Removed: Module system entries - no longer needed for healthcare application
+
+# Exclude release builds
+/releases
