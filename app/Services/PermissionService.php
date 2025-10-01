@@ -99,6 +99,17 @@ class PermissionService
                     'customer.force_delete',
                 ],
             ],
+            [
+                'group_name' => 'order',
+                'permissions' => [
+                    'order.create',
+                    'order.view',
+                    'order.edit',
+                    'order.delete',
+                    'order.restore',
+                    'order.force_delete',
+                ],
+            ],
         ];
 
         return $permissions;

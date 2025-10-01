@@ -1,18 +1,37 @@
 <x-layouts.backend-layout>
     <x-slot name="title">{{ $breadcrumbs['title'] }}</x-slot>
 
-    <x-breadcrumbs :breadcrumbs="$breadcrumbs" />
-
-    <div class="space-y-6">
-        <!-- Page Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('Update the category information.') }}
-                </p>
-            </div>
-            
+    <x-slot name="breadcrumbsData">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <h2 class="text-xl font-semibold text-gray-700 dark:text-white/90">
+                {{ __('Edit Category') }}
+            </h2>
             <div class="flex items-center gap-3">
+                <nav>
+                    <ol class="flex items-center gap-1.5 pe-2">
+                        <li>
+                            <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400" href="{{ route('admin.dashboard') }}">
+                                {{ __("Home") }}
+                                <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400" href="{{ route('admin.service-categories.index') }}">
+                                {{ __("Service Categories") }}
+                                <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400" href="{{ route('admin.service-categories.show', $category) }}">
+                                {{ $category->name }}
+                                <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+                            </a>
+                        </li>
+                        <li class="text-sm text-gray-700 dark:text-white/90">
+                            {{ __('Edit') }}
+                        </li>
+                    </ol>
+                </nav>
                 <x-buttons.button
                     variant="secondary"
                     as="a"
@@ -21,7 +40,6 @@
                 >
                     {{ __('View Category') }}
                 </x-buttons.button>
-
                 <x-buttons.button
                     variant="secondary"
                     as="a"
@@ -32,6 +50,10 @@
                 </x-buttons.button>
             </div>
         </div>
+        <x-messages />
+    </x-slot>
+
+    <div class="space-y-6">
 
         <!-- Edit Form -->
         <x-card>

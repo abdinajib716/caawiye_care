@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PaymentTransaction extends Model
 {
@@ -60,6 +61,14 @@ class PaymentTransaction extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    /**
+     * Get the order associated with the payment transaction.
+     */
+    public function order(): HasOne
+    {
+        return $this->hasOne(Order::class, 'payment_transaction_id');
     }
 
     /**

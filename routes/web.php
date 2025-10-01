@@ -55,6 +55,18 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::resource('service-categories', App\Http\Controllers\Backend\ServiceCategoryController::class);
     Route::delete('service-categories/bulk-delete', [App\Http\Controllers\Backend\ServiceCategoryController::class, 'bulkDelete'])->name('service-categories.bulk-delete');
 
+    // Order Zone Route (Create orders)
+    Route::get('order-zone', [App\Http\Controllers\Backend\OrderZoneController::class, 'index'])->name('order-zone.index');
+
+    // Orders Routes (View/Manage orders)
+    Route::get('orders', [App\Http\Controllers\Backend\OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{order}', [App\Http\Controllers\Backend\OrderController::class, 'show'])->name('orders.show');
+    Route::patch('orders/{order}/status', [App\Http\Controllers\Backend\OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::post('orders/{order}/cancel', [App\Http\Controllers\Backend\OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::delete('orders/{order}', [App\Http\Controllers\Backend\OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::delete('orders/bulk-delete', [App\Http\Controllers\Backend\OrderController::class, 'bulkDelete'])->name('orders.bulk-delete');
+    Route::patch('orders/bulk-update-status', [App\Http\Controllers\Backend\OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
+
     // Removed: Modules Routes
 
     // Settings Routes.

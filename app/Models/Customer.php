@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Concerns\QueryBuilderTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
@@ -47,6 +48,14 @@ class Customer extends Model
         'status_label',
         'status_color',
     ];
+
+    /**
+     * Get the orders for the customer.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
 
     /**
      * Scope a query to only include active customers.

@@ -167,6 +167,36 @@ class AdminMenuService
             ],
         ]);
 
+        // Order Zone - Quick Order Creation
+        $this->addMenuItem([
+            'label' => __('Order Zone'),
+            'icon' => 'lucide:zap',
+            'route' => route('admin.order-zone.index'),
+            'active' => Route::is('admin.order-zone.*'),
+            'id' => 'order-zone',
+            'priority' => 20,
+            'permissions' => 'order.create',
+        ]);
+
+        // Orders Management
+        $this->addMenuItem([
+            'label' => __('Orders'),
+            'icon' => 'lucide:shopping-cart',
+            'id' => 'orders-submenu',
+            'active' => Route::is('admin.orders.*'),
+            'priority' => 25,
+            'permissions' => 'order.view',
+            'children' => [
+                [
+                    'label' => __('All Orders'),
+                    'route' => route('admin.orders.index'),
+                    'active' => Route::is('admin.orders.index') || Route::is('admin.orders.show'),
+                    'priority' => 10,
+                    'permissions' => 'order.view',
+                ],
+            ],
+        ]);
+
         // Removed: Posts, Media Library, and Modules functionality
         // $this->registerPostTypesInMenu(null);
         // Media Library and Modules menu items removed

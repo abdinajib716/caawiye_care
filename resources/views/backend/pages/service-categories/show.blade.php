@@ -1,26 +1,42 @@
 <x-layouts.backend-layout>
     <x-slot name="title">{{ $breadcrumbs['title'] }}</x-slot>
 
-    <x-breadcrumbs :breadcrumbs="$breadcrumbs" />
-
-    <div class="space-y-6">
-        <!-- Page Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-3">
-                    @if($category->is_active)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                            {{ __('Active') }}
-                        </span>
-                    @else
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                            {{ __('Inactive') }}
-                        </span>
-                    @endif
-                </div>
-            </div>
-            
+    <x-slot name="breadcrumbsData">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
+                <h2 class="text-xl font-semibold text-gray-700 dark:text-white/90">
+                    {{ $category->name }}
+                </h2>
+                @if($category->is_active)
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        {{ __('Active') }}
+                    </span>
+                @else
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                        {{ __('Inactive') }}
+                    </span>
+                @endif
+            </div>
+            <div class="flex items-center gap-3">
+                <nav>
+                    <ol class="flex items-center gap-1.5 pe-2">
+                        <li>
+                            <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400" href="{{ route('admin.dashboard') }}">
+                                {{ __("Home") }}
+                                <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400" href="{{ route('admin.service-categories.index') }}">
+                                {{ __("Service Categories") }}
+                                <iconify-icon icon="lucide:chevron-right"></iconify-icon>
+                            </a>
+                        </li>
+                        <li class="text-sm text-gray-700 dark:text-white/90">
+                            {{ $category->name }}
+                        </li>
+                    </ol>
+                </nav>
                 <x-buttons.button
                     variant="secondary"
                     as="a"
@@ -29,7 +45,6 @@
                 >
                     {{ __('Edit Category') }}
                 </x-buttons.button>
-
                 <x-buttons.button
                     variant="secondary"
                     as="a"
@@ -40,6 +55,10 @@
                 </x-buttons.button>
             </div>
         </div>
+        <x-messages />
+    </x-slot>
+
+    <div class="space-y-6">
 
         <!-- Category Information -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
