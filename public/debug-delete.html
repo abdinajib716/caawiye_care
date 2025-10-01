@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Delete Icons</title>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-2xl font-bold mb-8">Debug Delete Icons</h1>
+    
+    <!-- Test if Alpine.js is working -->
+    <div x-data="{ message: 'Alpine.js is working!' }" class="mb-4 p-4 bg-green-100 rounded">
+        <p x-text="message"></p>
+    </div>
+    
+    <!-- Test delete button -->
+    <div class="mb-4">
+        <button @click="alert('Button clicked!')" 
+                class="inline-flex items-center justify-center w-8 h-8 text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors duration-200">
+            <iconify-icon icon="lucide:trash-2" class="w-4 h-4"></iconify-icon>
+        </button>
+        <span class="ml-2">Click this delete icon - should show alert</span>
+    </div>
+    
+    <!-- Test event dispatch -->
+    <div class="mb-4">
+        <button @click="$dispatch('test-event', { message: 'Event dispatched!' })" 
+                class="px-4 py-2 bg-blue-500 text-white rounded">
+            Dispatch Event
+        </button>
+        <div @test-event.window="alert('Event received: ' + $event.detail.message)" class="inline-block ml-2">
+            (Event listener)
+        </div>
+    </div>
+    
+    <!-- Test the actual delete modal setup -->
+    <div class="mb-4">
+        <button @click="$dispatch('open-delete-modal', { serviceId: 123, serviceName: 'Test Service' })" 
+                class="px-4 py-2 bg-red-500 text-white rounded">
+            Test Delete Modal
+        </button>
+    </div>
+    
+    <!-- Simple modal test -->
+    <div x-data="{ isOpen: false }" class="mb-4">
+        <button @click="isOpen = true" class="px-4 py-2 bg-purple-500 text-white rounded">
+            Open Simple Modal
+        </button>
+        
+        <div x-show="isOpen" 
+             x-cloak
+             class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
+             style="display: none;">
+            <div class="bg-white p-6 rounded-lg">
+                <h3 class="text-lg font-bold mb-4">Simple Modal</h3>
+                <p class="mb-4">This is a test modal</p>
+                <button @click="isOpen = false" class="px-4 py-2 bg-gray-500 text-white rounded">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+    
+    <script>
+        // Check if Alpine.js is loaded
+        document.addEventListener('alpine:init', () => {
+            console.log('✅ Alpine.js initialized');
+        });
+        
+        // Check for any JavaScript errors
+        window.addEventListener('error', (e) => {
+            console.error('❌ JavaScript Error:', e.error);
+        });
+        
+        // Test event listening
+        window.addEventListener('open-delete-modal', (e) => {
+            console.log('🔥 Received open-delete-modal event:', e.detail);
+            alert('Delete modal event received for service: ' + e.detail.serviceName);
+        });
+    </script>
+</body>
+</html>

@@ -10,6 +10,7 @@ use App\Http\Controllers\Backend\LocaleController;
 use App\Http\Controllers\Backend\PermissionController;
 use App\Http\Controllers\Backend\ProfileController;
 use App\Http\Controllers\Backend\RoleController;
+use App\Http\Controllers\Backend\ServiceController;
 use App\Http\Controllers\Backend\SettingController;
 use App\Http\Controllers\Backend\TermController;
 use App\Http\Controllers\Backend\TranslationController;
@@ -39,6 +40,20 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     // Permissions Routes.
     Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
     Route::get('/permissions/{permission}', [PermissionController::class, 'show'])->name('permissions.show');
+
+    // Services Routes.
+    Route::resource('services', ServiceController::class);
+    Route::delete('services/bulk-delete', [ServiceController::class, 'bulkDelete'])->name('services.bulk-delete');
+    Route::patch('services/bulk-update-status', [ServiceController::class, 'bulkUpdateStatus'])->name('services.bulk-update-status');
+
+    // Customers Routes.
+    Route::resource('customers', App\Http\Controllers\Backend\CustomerController::class);
+    Route::delete('customers/bulk-delete', [App\Http\Controllers\Backend\CustomerController::class, 'bulkDelete'])->name('customers.bulk-delete');
+    Route::patch('customers/bulk-update-status', [App\Http\Controllers\Backend\CustomerController::class, 'bulkUpdateStatus'])->name('customers.bulk-update-status');
+
+    // Service Categories Routes.
+    Route::resource('service-categories', App\Http\Controllers\Backend\ServiceCategoryController::class);
+    Route::delete('service-categories/bulk-delete', [App\Http\Controllers\Backend\ServiceCategoryController::class, 'bulkDelete'])->name('service-categories.bulk-delete');
 
     // Removed: Modules Routes
 

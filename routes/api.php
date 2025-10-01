@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AiContentController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\TermController;
 use App\Http\Controllers\Api\UserController;
@@ -61,6 +62,24 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
     Route::get('permissions', [PermissionController::class, 'index'])->name('api.permissions.index');
     Route::get('permissions/groups', [PermissionController::class, 'groups'])->name('api.permissions.groups');
     Route::get('permissions/{id}', [PermissionController::class, 'show'])->name('api.permissions.show');
+
+    // Service management
+    Route::apiResource('services', ServiceController::class);
+    Route::get('services/active', [ServiceController::class, 'active'])->name('api.services.active');
+    Route::get('services/featured', [ServiceController::class, 'featured'])->name('api.services.featured');
+    Route::get('services/statistics', [ServiceController::class, 'statistics'])->name('api.services.statistics');
+    Route::post('services/search', [ServiceController::class, 'search'])->name('api.services.search');
+    Route::post('services/bulk-update-status', [ServiceController::class, 'bulkUpdateStatus'])->name('api.services.bulk-update-status');
+    Route::post('services/bulk-delete', [ServiceController::class, 'bulkDelete'])->name('api.services.bulk-delete');
+
+    // Customer management
+    Route::apiResource('customers', App\Http\Controllers\Api\CustomerController::class);
+    Route::get('customers/active', [App\Http\Controllers\Api\CustomerController::class, 'active'])->name('api.customers.active');
+    Route::get('customers/statistics', [App\Http\Controllers\Api\CustomerController::class, 'statistics'])->name('api.customers.statistics');
+    Route::post('customers/search', [App\Http\Controllers\Api\CustomerController::class, 'search'])->name('api.customers.search');
+    Route::get('customers/by-country', [App\Http\Controllers\Api\CustomerController::class, 'byCountry'])->name('api.customers.by-country');
+    Route::post('customers/bulk-update-status', [App\Http\Controllers\Api\CustomerController::class, 'bulkUpdateStatus'])->name('api.customers.bulk-update-status');
+    Route::post('customers/bulk-delete', [App\Http\Controllers\Api\CustomerController::class, 'bulkDelete'])->name('api.customers.bulk-delete');
 
     // Removed: Posts and Terms management routes
 

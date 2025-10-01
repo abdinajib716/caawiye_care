@@ -108,6 +108,65 @@ class AdminMenuService
             'permissions' => 'dashboard.view',
         ]);
 
+        // Services Management
+        $this->addMenuItem([
+            'label' => __('Services'),
+            'icon' => 'lucide:briefcase',
+            'id' => 'services-submenu',
+            'active' => Route::is('admin.services.*') || Route::is('admin.service-categories.*'),
+            'priority' => 10,
+            'permissions' => 'service.view',
+            'children' => [
+                [
+                    'label' => __('All Services'),
+                    'route' => route('admin.services.index'),
+                    'active' => Route::is('admin.services.index') || Route::is('admin.services.show'),
+                    'priority' => 10,
+                    'permissions' => 'service.view',
+                ],
+                [
+                    'label' => __('Add Service'),
+                    'route' => route('admin.services.create'),
+                    'active' => Route::is('admin.services.create'),
+                    'priority' => 20,
+                    'permissions' => 'service.create',
+                ],
+                [
+                    'label' => __('Categories'),
+                    'route' => route('admin.service-categories.index'),
+                    'active' => Route::is('admin.service-categories.*'),
+                    'priority' => 30,
+                    'permissions' => 'service.view',
+                ],
+            ],
+        ]);
+
+        // Customers Management
+        $this->addMenuItem([
+            'label' => __('Customers'),
+            'icon' => 'lucide:users',
+            'id' => 'customers-submenu',
+            'active' => Route::is('admin.customers.*'),
+            'priority' => 15,
+            'permissions' => 'customer.view',
+            'children' => [
+                [
+                    'label' => __('All Customers'),
+                    'route' => route('admin.customers.index'),
+                    'active' => Route::is('admin.customers.index') || Route::is('admin.customers.show'),
+                    'priority' => 10,
+                    'permissions' => 'customer.view',
+                ],
+                [
+                    'label' => __('Add Customer'),
+                    'route' => route('admin.customers.create'),
+                    'active' => Route::is('admin.customers.create'),
+                    'priority' => 20,
+                    'permissions' => 'customer.create',
+                ],
+            ],
+        ]);
+
         // Removed: Posts, Media Library, and Modules functionality
         // $this->registerPostTypesInMenu(null);
         // Media Library and Modules menu items removed

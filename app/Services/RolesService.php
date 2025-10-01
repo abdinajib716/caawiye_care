@@ -304,6 +304,8 @@ class RolesService
                     'post.edit',
                     'term.view',
                     'term.create',
+                    // Add customer permissions for Editor
+                    'customer.view',
                 ];
 
             case 'Subscriber':

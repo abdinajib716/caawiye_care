@@ -23,16 +23,7 @@ class PermissionService
                     'dashboard.view',
                 ],
             ],
-            [
-                'group_name' => 'blog',
-                'permissions' => [
-                    'blog.create',
-                    'blog.view',
-                    'blog.edit',
-                    'blog.delete',
-                    'blog.approve',
-                ],
-            ],
+
             [
                 'group_name' => 'user',
                 'permissions' => [
@@ -54,15 +45,7 @@ class PermissionService
                     'role.approve',
                 ],
             ],
-            [
-                'group_name' => 'module',
-                'permissions' => [
-                    'module.create',
-                    'module.view',
-                    'module.edit',
-                    'module.delete',
-                ],
-            ],
+
             [
                 'group_name' => 'profile',
                 'permissions' => [
@@ -93,32 +76,27 @@ class PermissionService
                     'translations.edit',
                 ],
             ],
+
             [
-                'group_name' => 'post',
+                'group_name' => 'service',
                 'permissions' => [
-                    'post.create',
-                    'post.view',
-                    'post.edit',
-                    'post.delete',
-                    'term.create',
-                    'term.view',
-                    'term.edit',
-                    'term.delete',
+                    'service.create',
+                    'service.view',
+                    'service.edit',
+                    'service.delete',
+                    'service.restore',
+                    'service.force_delete',
                 ],
             ],
             [
-                'group_name' => 'media',
+                'group_name' => 'customer',
                 'permissions' => [
-                    'media.create',
-                    'media.view',
-                    'media.edit',
-                    'media.delete',
-                ],
-            ],
-            [
-                'group_name' => 'ai_content',
-                'permissions' => [
-                    'ai_content.generate',
+                    'customer.create',
+                    'customer.view',
+                    'customer.edit',
+                    'customer.delete',
+                    'customer.restore',
+                    'customer.force_delete',
                 ],
             ],
         ];
@@ -179,12 +157,15 @@ class PermissionService
     public function getDatabasePermissionGroups(): Collection
     {
         $groups = Permission::select('group_name as name')
+            ->whereNotNull('group_name')
             ->groupBy('group_name')
             ->get();
 
         // Add the permissions to each group.
         foreach ($groups as $group) {
-            $group->setAttribute('permissions', $this->getPermissionModelsByGroup($group->name));
+            if ($group->name) {
+                $group->setAttribute('permissions', $this->getPermissionModelsByGroup($group->name));
+            }
         }
 
         return $groups;
