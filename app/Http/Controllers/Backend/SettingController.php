@@ -82,7 +82,7 @@ class SettingController extends Controller
         $uploadPath = 'uploads/settings';
 
         // Handle checkbox fields that might not be present when unchecked
-        $checkboxFields = ['disable_default_admin_redirect'];
+        $checkboxFields = ['disable_default_admin_redirect', 'waafipay_enabled'];
         foreach ($checkboxFields as $checkboxField) {
             // Skip restricted fields in demo mode
             if (config('app.demo_mode', false) && in_array($checkboxField, $restrictedFields ?? [])) {
@@ -139,7 +139,9 @@ class SettingController extends Controller
         session()->forget(['_old_input', '_flash']);
 
         // Use PRG pattern (Post-Redirect-Get) with explicit tab parameter
-        return redirect()->route('admin.settings.index', ['tab' => 'email'])
+        // Preserve the current tab from the request
+        $currentTab = $request->input('current_tab', 'general');
+        return redirect()->route('admin.settings.index', ['tab' => $currentTab])
             ->with('success', 'Settings saved successfully!')
             ->with('settings_updated', true);
     }

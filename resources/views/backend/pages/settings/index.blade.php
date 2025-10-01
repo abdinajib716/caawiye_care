@@ -16,8 +16,10 @@
                     action="{{ route('admin.settings.store') }}"
                     enctype="multipart/form-data"
                     data-prevent-unsaved-changes
+                    id="settings-form"
                 >
                     @csrf
+                    <input type="hidden" name="current_tab" id="current_tab_input" value="{{ $tab ?? 'general' }}">
                     @include('backend.pages.settings.tabs', [
                         'tabs' => Hook::applyFilters(SettingFilterHook::SETTINGS_TABS, [
                             'general' => [
@@ -32,6 +34,10 @@
                                 'title' => __('Email Configuration'),
                                 'view' => 'backend.pages.settings.email-tab',
                             ],
+                            'payment-methods' => [
+                                'title' => __('Payment Methods'),
+                                'view' => 'backend.pages.settings.payment-methods-tab',
+                            ],
                             // Removed: Content Settings, Integrations, Performance & Security - Not needed for healthcare application
                         ]),
                     ])
@@ -41,6 +47,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Test WaafiPay Modal -->
+    <livewire:test-waafi-pay-modal />
 
     @push('scripts')
     <script>
@@ -73,6 +82,12 @@
                     const url = new URL(window.location);
                     url.searchParams.set('tab', tabKey);
                     window.history.pushState({}, '', url);
+
+                    // Update hidden field for form submission
+                    const currentTabInput = document.getElementById('current_tab_input');
+                    if (currentTabInput) {
+                        currentTabInput.value = tabKey;
+                    }
 
                     setActiveTab(tabKey);
                 });
