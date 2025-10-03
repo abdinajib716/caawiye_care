@@ -67,6 +67,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::delete('orders/bulk-delete', [App\Http\Controllers\Backend\OrderController::class, 'bulkDelete'])->name('orders.bulk-delete');
     Route::patch('orders/bulk-update-status', [App\Http\Controllers\Backend\OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
 
+    // Transactions Routes (View/Manage payment transactions)
+    Route::get('transactions', [App\Http\Controllers\Backend\TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('transactions/{transaction}', [App\Http\Controllers\Backend\TransactionController::class, 'show'])->name('transactions.show');
+
     // Removed: Modules Routes
 
     // Settings Routes.

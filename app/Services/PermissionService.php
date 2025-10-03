@@ -110,6 +110,15 @@ class PermissionService
                     'order.force_delete',
                 ],
             ],
+            [
+                'group_name' => 'transaction',
+                'permissions' => [
+                    'transaction.view',
+                    'transaction.create',
+                    'transaction.edit',
+                    'transaction.delete',
+                ],
+            ],
         ];
 
         return $permissions;

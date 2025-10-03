@@ -26,6 +26,11 @@ class OrderPreview extends Component
     public bool $waafipayEnabled = false;
     public bool $edahabEnabled = false;
 
+    // Payment progress UI
+    public bool $showPaymentModal = false;
+    public string $paymentStatusMessage = 'Initiating payment request...';
+    public int $paymentStep = 0; // 0=not started, 1=request sent, 2=waiting confirmation, 3=creating order
+
     protected OrderService $orderService;
     protected WaafipayService $waafipayService;
 
@@ -94,11 +99,19 @@ class OrderPreview extends Component
     public function processOrder()
     {
         if (!$this->canProcess) {
-            $this->dispatch('show-error', ['message' => __('Please select services and customer')]);
+            $this->dispatch('notify', [
+                'variant' => 'error',
+                'title' => __('Cannot Process Order'),
+                'message' => __('Please select services and customer'),
+            ]);
             return;
         }
 
+        // Show payment modal and reset progress
+        $this->showPaymentModal = true;
         $this->processing = true;
+        $this->paymentStep = 0;
+        $this->paymentStatusMessage = __('Initiating payment request...');
 
         try {
             // Prepare order items
@@ -116,32 +129,187 @@ class OrderPreview extends Component
             $paymentMethod = 'mobile_money';
             $paymentProvider = $this->provider;
 
-            // Create order
-            $order = $this->orderService->createOrder([
+            // Update progress: Sending payment request
+            $this->paymentStep = 1;
+            $this->paymentStatusMessage = __('Sending payment request to WaafiPay...');
+
+            // Process payment through WaafiPay FIRST
+            $paymentResult = $this->waafipayService->processPayment([
+                'phone' => $this->customer['phone'],
+                'amount' => $this->total,
+                'customer_name' => $this->customer['name'],
                 'customer_id' => $this->customer['id'],
-                'items' => $items,
-                'subtotal' => $this->subtotal,
-                'tax' => $this->tax,
-                'discount' => $this->discount,
-                'total' => $this->total,
-                'payment_method' => $paymentMethod,
-                'payment_provider' => $paymentProvider,
-                'payment_phone' => $this->customer['phone'],
-                'payment_status' => 'pending',
-                'status' => 'pending',
+                'description' => 'Order payment for ' . count($items) . ' service(s)',
+                'currency' => 'USD',
             ]);
+
+            // Check if payment was successful
+            if (!$paymentResult['success']) {
+                $this->processing = false;
+                $this->showPaymentModal = false;
+                $this->paymentStep = 0;
+                $this->dispatch('notify', [
+                    'variant' => 'error',
+                    'title' => __('Payment Failed'),
+                    'message' => $paymentResult['message'] ?? __('Payment could not be processed'),
+                ]);
+                return;
+            }
+
+            // Update progress: Waiting for confirmation
+            $this->paymentStep = 2;
+            $this->paymentStatusMessage = __('Payment request sent. Waiting for confirmation from provider...');
+
+            // If payment is pending, dispatch event to start polling
+            if (isset($paymentResult['pending']) && $paymentResult['pending']) {
+                // Keep modal open and show waiting state
+                $this->paymentStatusMessage = __('Waiting for payment confirmation. Please check your phone...');
+
+                $this->dispatch('payment-pending', [
+                    'reference_id' => $paymentResult['reference_id'],
+                    'order_data' => [
+                        'customer_id' => $this->customer['id'],
+                        'items' => $items,
+                        'tax' => $this->tax,
+                        'discount' => $this->discount,
+                        'payment_method' => $paymentMethod,
+                        'payment_provider' => $paymentProvider,
+                        'payment_phone' => $this->customer['phone'],
+                    ],
+                ]);
+                return;
+            }
+
+            // Payment completed immediately - create order
+            if (isset($paymentResult['transaction'])) {
+                // Update progress: Creating order
+                $this->paymentStep = 3;
+                $this->paymentStatusMessage = __('Payment confirmed! Creating your order...');
+
+                $order = $this->orderService->createOrderFromTransaction(
+                    $paymentResult['transaction'],
+                    [
+                        'customer_id' => $this->customer['id'],
+                        'items' => $items,
+                        'tax' => $this->tax,
+                        'discount' => $this->discount,
+                        'payment_method' => $paymentMethod,
+                        'payment_provider' => $paymentProvider,
+                        'payment_phone' => $this->customer['phone'],
+                    ]
+                );
+
+                // Clear the order zone
+                $this->dispatch('clear-order');
+
+                // Close modal and redirect
+                $this->showPaymentModal = false;
+                $this->processing = false;
+
+                // Redirect to order details
+                session()->flash('success', __('Payment successful! Order #:number created', ['number' => $order->order_number]));
+                $this->redirect(route('admin.orders.show', $order), navigate: true);
+            }
+
+        } catch (\Exception $e) {
+            $this->processing = false;
+            $this->showPaymentModal = false;
+            $this->paymentStep = 0;
+            $this->dispatch('notify', [
+                'variant' => 'error',
+                'title' => __('Error'),
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Cancel the order and reset the form.
+     */
+    public function cancelOrder()
+    {
+        // Close payment modal if open
+        $this->showPaymentModal = false;
+        $this->processing = false;
+        $this->paymentStep = 0;
+        $this->paymentStatusMessage = 'Initiating payment request...';
+
+        // Clear the order zone
+        $this->dispatch('clear-order');
+
+        $this->dispatch('notify', [
+            'variant' => 'info',
+            'title' => __('Order Cancelled'),
+            'message' => __('The order has been cancelled'),
+        ]);
+    }
+
+    /**
+     * Test method to show modal (for debugging).
+     */
+    public function testModal()
+    {
+        $this->showPaymentModal = true;
+        $this->paymentStep = 1;
+        $this->paymentStatusMessage = 'Testing modal display...';
+    }
+
+    /**
+     * Check payment status (called by frontend polling).
+     */
+    public function checkPaymentStatus(string $referenceId)
+    {
+        $result = $this->waafipayService->checkPaymentStatus($referenceId);
+
+        if (!$result['success']) {
+            return [
+                'status' => 'error',
+                'message' => $result['message'],
+            ];
+        }
+
+        $transaction = $result['transaction'];
+
+        return [
+            'status' => $transaction->status,
+            'transaction_id' => $transaction->id,
+            'message' => $result['message'] ?? '',
+        ];
+    }
+
+    /**
+     * Create order after payment confirmation.
+     */
+    public function createOrderAfterPayment(int $transactionId, array $orderData)
+    {
+        try {
+            $transaction = \App\Models\PaymentTransaction::find($transactionId);
+
+            if (!$transaction || !$transaction->isCompleted()) {
+                $this->dispatch('notify', [
+                    'variant' => 'error',
+                    'title' => __('Payment Not Completed'),
+                    'message' => __('Payment must be completed before creating order'),
+                ]);
+                return;
+            }
+
+            // Create order from completed transaction
+            $order = $this->orderService->createOrderFromTransaction($transaction, $orderData);
 
             // Clear the order zone
             $this->dispatch('clear-order');
 
             // Redirect to order details
-            session()->flash('success', __('Order created successfully! Order #:number', ['number' => $order->order_number]));
-
+            session()->flash('success', __('Payment successful! Order #:number created', ['number' => $order->order_number]));
             $this->redirect(route('admin.orders.show', $order), navigate: true);
 
         } catch (\Exception $e) {
-            $this->processing = false;
-            $this->dispatch('show-error', ['message' => $e->getMessage()]);
+            $this->dispatch('notify', [
+                'variant' => 'error',
+                'title' => __('Error Creating Order'),
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 

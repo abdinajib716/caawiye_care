@@ -197,6 +197,17 @@ class AdminMenuService
             ],
         ]);
 
+        // Transactions Management
+        $this->addMenuItem([
+            'label' => __('Transactions'),
+            'icon' => 'lucide:credit-card',
+            'route' => route('admin.transactions.index'),
+            'active' => Route::is('admin.transactions.*'),
+            'id' => 'transactions',
+            'priority' => 30,
+            'permissions' => 'transaction.view',
+        ]);
+
         // Removed: Posts, Media Library, and Modules functionality
         // $this->registerPostTypesInMenu(null);
         // Media Library and Modules menu items removed

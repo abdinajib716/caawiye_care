@@ -129,6 +129,63 @@ class OrderService
     }
 
     /**
+     * Create order from completed payment transaction.
+     * This is called AFTER payment is confirmed.
+     */
+    public function createOrderFromTransaction(\App\Models\PaymentTransaction $transaction, array $orderData): Order
+    {
+        return DB::transaction(function () use ($transaction, $orderData) {
+            // Generate unique order number
+            $orderNumber = $this->generateOrderNumber();
+
+            // Set agent_id to current user if not provided
+            $agentId = $orderData['agent_id'] ?? Auth::id();
+
+            // Calculate totals
+            $subtotal = 0;
+            foreach ($orderData['items'] as $item) {
+                $subtotal += $item['unit_price'] * $item['quantity'];
+            }
+
+            $tax = $orderData['tax'] ?? 0;
+            $discount = $orderData['discount'] ?? 0;
+            $total = $subtotal + $tax - $discount;
+
+            // Create order with completed payment status
+            $order = Order::create([
+                'order_number' => $orderNumber,
+                'customer_id' => $orderData['customer_id'],
+                'agent_id' => $agentId,
+                'subtotal' => $subtotal,
+                'tax' => $tax,
+                'discount' => $discount,
+                'total' => $total,
+                'payment_method' => $orderData['payment_method'],
+                'payment_provider' => $orderData['payment_provider'] ?? null,
+                'payment_phone' => $orderData['payment_phone'],
+                'payment_status' => 'completed', // Payment already completed
+                'payment_transaction_id' => $transaction->id,
+                'status' => 'processing', // Start as processing since payment is done
+                'notes' => $orderData['notes'] ?? null,
+            ]);
+
+            // Create order items
+            foreach ($orderData['items'] as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'service_id' => $item['service_id'],
+                    'service_name' => $item['service_name'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'total_price' => $item['unit_price'] * $item['quantity'],
+                ]);
+            }
+
+            return $order->load(['customer', 'agent', 'items.service', 'paymentTransaction']);
+        });
+    }
+
+    /**
      * Update an existing order.
      */
     public function updateOrder(Order $order, array $data): Order

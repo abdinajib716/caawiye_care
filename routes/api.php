@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\TermController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\WaafiPayWebhookController;
 // Removed: BackendTermController import
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,12 @@ Route::get('/translations/{lang}', function (string $lang) {
 
     return response()->json($translations);
 });
+
+// WaafiPay webhook (public - no auth required)
+Route::post('/waafipay/webhook', [WaafiPayWebhookController::class, 'handlePaymentConfirmation'])->name('api.waafipay.webhook');
+
+// Payment status check (public - for polling)
+Route::post('/waafipay/check-status', [WaafiPayWebhookController::class, 'checkPaymentStatus'])->name('api.waafipay.check-status');
 
 // Authentication routes
 Route::prefix('auth')->group(function () {
