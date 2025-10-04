@@ -167,6 +167,43 @@ class AdminMenuService
             ],
         ]);
 
+        // Hospitals Management
+        $this->addMenuItem([
+            'label' => __('Hospitals'),
+            'icon' => 'lucide:building-2',
+            'id' => 'hospitals-submenu',
+            'active' => Route::is('admin.hospitals.*'),
+            'priority' => 16,
+            'permissions' => 'hospital.view',
+            'children' => [
+                [
+                    'label' => __('All Hospitals'),
+                    'route' => route('admin.hospitals.index'),
+                    'active' => Route::is('admin.hospitals.index') || Route::is('admin.hospitals.show'),
+                    'priority' => 10,
+                    'permissions' => 'hospital.view',
+                ],
+                [
+                    'label' => __('Add Hospital'),
+                    'route' => route('admin.hospitals.create'),
+                    'active' => Route::is('admin.hospitals.create'),
+                    'priority' => 20,
+                    'permissions' => 'hospital.create',
+                ],
+            ],
+        ]);
+
+        // Appointments Management
+        $this->addMenuItem([
+            'label' => __('Appointments'),
+            'icon' => 'lucide:calendar-check',
+            'route' => route('admin.appointments.index'),
+            'active' => Route::is('admin.appointments.*'),
+            'id' => 'appointments',
+            'priority' => 17,
+            'permissions' => 'appointment.view',
+        ]);
+
         // Order Zone - Quick Order Creation
         $this->addMenuItem([
             'label' => __('Order Zone'),

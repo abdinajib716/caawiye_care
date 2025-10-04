@@ -66,32 +66,36 @@
 
     <!-- Matching Customers List -->
     @if(!$showNewCustomerForm && !$customerFound && count($matchingCustomers) > 0)
-        <div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-            <h4 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">
-                {{ __('Select Customer') }}
-            </h4>
-            <div class="max-h-64 space-y-2 overflow-y-auto">
+        <div class="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+            <div class="border-b border-gray-200 px-3 py-2 dark:border-gray-700">
+                <h4 class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {{ __('Select Customer') }}
+                </h4>
+            </div>
+            <div class="max-h-48 overflow-y-auto">
                 @foreach($matchingCustomers as $customer)
                     <button
                         type="button"
                         wire:click="selectCustomer({{ $customer['id'] }})"
-                        class="w-full rounded-lg border border-gray-200 bg-white p-3 text-left transition-colors hover:border-blue-300 hover:bg-blue-50 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-blue-600 dark:hover:bg-gray-600"
+                        class="w-full border-b border-gray-100 px-3 py-2.5 text-left transition-colors hover:bg-blue-50 last:border-b-0 dark:border-gray-700 dark:hover:bg-gray-700/50"
                     >
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <p class="font-medium text-gray-900 dark:text-white">{{ $customer['name'] }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    <iconify-icon icon="lucide:phone" class="inline h-3.5 w-3.5"></iconify-icon>
-                                    {{ $customer['phone'] }}
-                                </p>
-                                @if(!empty($customer['address']))
-                                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                                        <iconify-icon icon="lucide:map-pin" class="inline h-3.5 w-3.5"></iconify-icon>
-                                        {{ $customer['address'] }}
-                                    </p>
-                                @endif
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="truncate text-sm font-medium text-gray-900 dark:text-white">{{ $customer['name'] }}</p>
+                                <div class="mt-0.5 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                    <span class="flex items-center gap-1">
+                                        <iconify-icon icon="lucide:phone" class="h-3 w-3"></iconify-icon>
+                                        {{ $customer['phone'] }}
+                                    </span>
+                                    @if(!empty($customer['address']))
+                                        <span class="flex items-center gap-1 truncate">
+                                            <iconify-icon icon="lucide:map-pin" class="h-3 w-3 flex-shrink-0"></iconify-icon>
+                                            <span class="truncate">{{ $customer['address'] }}</span>
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
-                            <iconify-icon icon="lucide:chevron-right" class="h-5 w-5 flex-shrink-0 text-gray-400"></iconify-icon>
+                            <iconify-icon icon="lucide:chevron-right" class="h-4 w-4 flex-shrink-0 text-gray-400"></iconify-icon>
                         </div>
                     </button>
                 @endforeach

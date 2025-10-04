@@ -140,6 +140,57 @@ class ServiceSeeder extends Seeder
                 'sku' => 'SRV-TC001',
                 'status' => 'active',
             ],
+            [
+                'name' => 'Doctor Appointment',
+                'slug' => 'doctor-appointment',
+                'short_description' => 'Schedule an appointment with a doctor at your preferred hospital',
+                'price' => 50.00,
+                'cost' => 20.00,
+                'category_id' => $consultationCategory?->id,
+                'status' => 'active',
+                'is_featured' => true,
+                'service_type' => 'appointment',
+                'has_custom_fields' => true,
+                'custom_fields_config' => [
+                    'fields' => [
+                        [
+                            'key' => 'appointment_type',
+                            'label' => 'Appointment Type',
+                            'type' => 'select',
+                            'required' => true,
+                            'options' => [
+                                ['value' => 'self', 'label' => 'Self'],
+                                ['value' => 'someone_else', 'label' => 'Someone Else'],
+                            ],
+                            'default_value' => 'self',
+                        ],
+                        [
+                            'key' => 'patient_name',
+                            'label' => 'Patient Name',
+                            'type' => 'text',
+                            'required' => true,
+                            'show_if' => [
+                                'field' => 'appointment_type',
+                                'value' => 'someone_else',
+                            ],
+                        ],
+                        [
+                            'key' => 'hospital_id',
+                            'label' => 'Hospital',
+                            'type' => 'select',
+                            'required' => true,
+                            'data_source' => 'hospitals',
+                        ],
+                        [
+                            'key' => 'appointment_time',
+                            'label' => 'Appointment Time',
+                            'type' => 'datetime',
+                            'required' => true,
+                            'validation' => 'future',
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         foreach ($services as $serviceData) {

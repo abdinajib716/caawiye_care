@@ -39,6 +39,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             // \App\Http\Middleware\ModuleTranslationMiddleware::class, // Removed with Module system
             \App\Http\Middleware\AdminRedirectMiddleware::class,
+            \App\Http\Middleware\AutoCreatePermissions::class, // Auto-create missing permissions
         ],
 
         'api' => [

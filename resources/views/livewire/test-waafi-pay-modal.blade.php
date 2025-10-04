@@ -48,13 +48,13 @@
                             type="text"
                             id="test_phone"
                             wire:model.live="phone"
-                            placeholder="619821172"
+                            placeholder="61XXXXXXX"
                             maxlength="9"
                             class="form-control rounded-none rounded-r-lg @error('phone') border-red-500 @enderror"
                         >
                     </div>
                     <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                        {{ __('Enter phone number without country code (e.g. 619821172)') }}
+                        {{ __('Enter phone number without country code (e.g. 61XXXXXXX)') }}
                     </p>
                     @error('phone')
                         <p class="mt-1.5 text-xs text-red-600 dark:text-red-400 flex items-center">

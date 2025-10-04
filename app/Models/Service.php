@@ -32,6 +32,9 @@ class Service extends Model
         'category_id',
         'status',
         'is_featured',
+        'service_type',
+        'has_custom_fields',
+        'custom_fields_config',
     ];
 
     /**
@@ -43,6 +46,8 @@ class Service extends Model
         'price' => 'decimal:2',
         'cost' => 'decimal:2',
         'is_featured' => 'boolean',
+        'has_custom_fields' => 'boolean',
+        'custom_fields_config' => 'array',
     ];
 
     /**
@@ -155,5 +160,52 @@ class Service extends Model
         };
     }
 
+    /**
+     * Check if service has custom fields.
+     */
+    public function hasCustomFields(): bool
+    {
+        return $this->has_custom_fields && !empty($this->custom_fields_config);
+    }
 
+    /**
+     * Get custom fields configuration.
+     */
+    public function getCustomFieldsConfig(): array
+    {
+        return $this->custom_fields_config ?? [];
+    }
+
+    /**
+     * Get custom fields array.
+     */
+    public function getCustomFields(): array
+    {
+        $config = $this->getCustomFieldsConfig();
+        return $config['fields'] ?? [];
+    }
+
+    /**
+     * Check if service is of a specific type.
+     */
+    public function isType(string $type): bool
+    {
+        return $this->service_type === $type;
+    }
+
+    /**
+     * Check if service is standard type.
+     */
+    public function isStandard(): bool
+    {
+        return $this->isType('standard');
+    }
+
+    /**
+     * Check if service is appointment type.
+     */
+    public function isAppointment(): bool
+    {
+        return $this->isType('appointment');
+    }
 }

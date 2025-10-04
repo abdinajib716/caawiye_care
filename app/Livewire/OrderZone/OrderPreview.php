@@ -60,6 +60,14 @@ class OrderPreview extends Component
         $this->checkCanProcess();
     }
 
+    #[On('service-details-completed')]
+    public function updateServicesWithFieldData($data)
+    {
+        $this->services = $data['services'] ?? [];
+        $this->calculateTotals();
+        $this->checkCanProcess();
+    }
+
     #[On('customer-updated')]
     public function updateCustomer($data)
     {
@@ -117,12 +125,19 @@ class OrderPreview extends Component
             // Prepare order items
             $items = [];
             foreach ($this->services as $service) {
-                $items[] = [
+                $item = [
                     'service_id' => $service['id'],
                     'service_name' => $service['name'],
                     'quantity' => $service['quantity'],
                     'unit_price' => $service['price'],
                 ];
+
+                // Add field data if present
+                if (!empty($service['field_data'])) {
+                    $item['field_data'] = $service['field_data'];
+                }
+
+                $items[] = $item;
             }
 
             // Determine payment method and provider
@@ -162,6 +177,19 @@ class OrderPreview extends Component
 
             // If payment is pending, dispatch event to start polling
             if (isset($paymentResult['pending']) && $paymentResult['pending']) {
+                // Check if reference_id exists
+                if (!isset($paymentResult['reference_id'])) {
+                    $this->processing = false;
+                    $this->showPaymentModal = false;
+                    $this->paymentStep = 0;
+                    $this->dispatch('notify', [
+                        'variant' => 'error',
+                        'title' => __('Payment Failed'),
+                        'message' => $paymentResult['message'] ?? __('Payment reference not received from provider'),
+                    ]);
+                    return;
+                }
+
                 // Keep modal open and show waiting state
                 $this->paymentStatusMessage = __('Waiting for payment confirmation. Please check your phone...');
 
@@ -244,15 +272,7 @@ class OrderPreview extends Component
         ]);
     }
 
-    /**
-     * Test method to show modal (for debugging).
-     */
-    public function testModal()
-    {
-        $this->showPaymentModal = true;
-        $this->paymentStep = 1;
-        $this->paymentStatusMessage = 'Testing modal display...';
-    }
+
 
     /**
      * Check payment status (called by frontend polling).

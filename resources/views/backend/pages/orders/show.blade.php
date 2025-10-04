@@ -162,6 +162,56 @@
                     </div>
                 </div>
 
+                <!-- Appointment Information -->
+                @php
+                    $appointments = $order->items->flatMap(fn($item) => $item->appointment ? [$item->appointment] : []);
+                @endphp
+                @if($appointments->isNotEmpty())
+                    <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+                            {{ __('Appointment Information') }}
+                        </h2>
+                        @foreach($appointments as $appointment)
+                            <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-600 dark:bg-gray-700/50">
+                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Hospital') }}</p>
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $appointment->hospital->name }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Appointment Time') }}</p>
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $appointment->formatted_appointment_time }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Status') }}</p>
+                                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ $appointment->status_color }}">
+                                            {{ $appointment->status_label }}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Appointment Type') }}</p>
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $appointment->appointment_type_label }}</p>
+                                    </div>
+                                    @if($appointment->patient_name)
+                                        <div class="md:col-span-2">
+                                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Patient Name') }}</p>
+                                            <p class="font-medium text-gray-900 dark:text-white">{{ $appointment->patient_name }}</p>
+                                        </div>
+                                    @endif
+                                </div>
+                                @can('appointment.view')
+                                    <div class="mt-4">
+                                        <a href="{{ route('admin.appointments.show', $appointment) }}" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400">
+                                            <iconify-icon icon="lucide:calendar-check" class="mr-2 h-4 w-4"></iconify-icon>
+                                            {{ __('View Appointment Details') }}
+                                        </a>
+                                    </div>
+                                @endcan
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
                 <!-- Notes -->
                 @if($order->notes)
                     <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">

@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Auth;
 class OrderService
 {
     /**
+     * Constructor with dependency injection.
+     */
+    public function __construct(
+        private ServiceFieldDataService $fieldDataService,
+        private AppointmentService $appointmentService
+    ) {
+    }
+
+    /**
      * Get paginated orders with optional filters.
      */
     public function getPaginatedOrders(array $filters = [], int $perPage = 15): LengthAwarePaginator
@@ -171,7 +180,7 @@ class OrderService
 
             // Create order items
             foreach ($orderData['items'] as $item) {
-                OrderItem::create([
+                $orderItem = OrderItem::create([
                     'order_id' => $order->id,
                     'service_id' => $item['service_id'],
                     'service_name' => $item['service_name'],
@@ -179,10 +188,46 @@ class OrderService
                     'unit_price' => $item['unit_price'],
                     'total_price' => $item['unit_price'] * $item['quantity'],
                 ]);
+
+                // Handle service field data if present
+                if (!empty($item['field_data'])) {
+                    $service = Service::find($item['service_id']);
+                    if ($service && $service->hasCustomFields()) {
+                        $this->fieldDataService->saveFieldData($orderItem, $service, $item['field_data']);
+
+                        // Create appointment if service is appointment type
+                        if ($service->isAppointment()) {
+                            $this->createAppointmentFromFieldData(
+                                $order,
+                                $orderItem,
+                                $item['field_data']
+                            );
+                        }
+                    }
+                }
             }
 
             return $order->load(['customer', 'agent', 'items.service', 'paymentTransaction']);
         });
+    }
+
+    /**
+     * Create appointment from field data.
+     */
+    private function createAppointmentFromFieldData(Order $order, OrderItem $orderItem, array $fieldData): void
+    {
+        $appointmentData = [
+            'order_id' => $order->id,
+            'order_item_id' => $orderItem->id,
+            'customer_id' => $order->customer_id,
+            'hospital_id' => $fieldData['hospital_id'],
+            'appointment_type' => $fieldData['appointment_type'] ?? 'self',
+            'patient_name' => $fieldData['patient_name'] ?? null,
+            'appointment_time' => $fieldData['appointment_time'],
+            'status' => 'scheduled',
+        ];
+
+        $this->appointmentService->createAppointment($appointmentData);
     }
 
     /**

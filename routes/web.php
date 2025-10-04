@@ -46,6 +46,17 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     Route::delete('services/bulk-delete', [ServiceController::class, 'bulkDelete'])->name('services.bulk-delete');
     Route::patch('services/bulk-update-status', [ServiceController::class, 'bulkUpdateStatus'])->name('services.bulk-update-status');
 
+    // Hospitals Routes.
+    Route::resource('hospitals', App\Http\Controllers\Backend\HospitalController::class);
+
+    // Appointments Routes.
+    Route::get('appointments', [App\Http\Controllers\Backend\AppointmentController::class, 'index'])->name('appointments.index');
+    Route::get('appointments/{appointment}', [App\Http\Controllers\Backend\AppointmentController::class, 'show'])->name('appointments.show');
+    Route::post('appointments/{appointment}/reschedule', [App\Http\Controllers\Backend\AppointmentController::class, 'reschedule'])->name('appointments.reschedule');
+    Route::post('appointments/{appointment}/cancel', [App\Http\Controllers\Backend\AppointmentController::class, 'cancel'])->name('appointments.cancel');
+    Route::post('appointments/{appointment}/confirm', [App\Http\Controllers\Backend\AppointmentController::class, 'confirm'])->name('appointments.confirm');
+    Route::post('appointments/{appointment}/complete', [App\Http\Controllers\Backend\AppointmentController::class, 'complete'])->name('appointments.complete');
+
     // Customers Routes.
     Route::resource('customers', App\Http\Controllers\Backend\CustomerController::class);
     Route::delete('customers/bulk-delete', [App\Http\Controllers\Backend\CustomerController::class, 'bulkDelete'])->name('customers.bulk-delete');

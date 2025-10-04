@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             ContentSeeder::class,
             ServiceCategorySeeder::class,
+            HospitalSeeder::class,
             ServiceSeeder::class,
             CustomerSeeder::class,
         ]);

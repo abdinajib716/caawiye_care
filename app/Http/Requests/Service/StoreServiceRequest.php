@@ -32,6 +32,54 @@ class StoreServiceRequest extends FormRequest
             'cost' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
             'category_id' => ['nullable', 'exists:service_categories,id'],
             'status' => ['required', Rule::in(['active', 'inactive', 'discontinued'])],
+            'service_type' => ['required', 'string', Rule::in(['standard', 'appointment'])],
+            'has_custom_fields' => ['nullable', 'boolean'],
+            'custom_fields_config' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    // If custom fields are enabled, config must be provided
+                    if ($this->has_custom_fields && empty($value)) {
+                        $fail('Custom fields configuration is required when custom fields are enabled.');
+                    }
+
+                    // If config is provided, validate structure
+                    if (!empty($value)) {
+                        // Handle both string (JSON) and array inputs
+                        $decoded = is_string($value) ? json_decode($value, true) : $value;
+
+                        // Check if JSON decode failed
+                        if (is_string($value) && json_last_error() !== JSON_ERROR_NONE) {
+                            $fail('The custom fields configuration must be valid JSON.');
+                            return;
+                        }
+
+                        // Check if it has 'fields' array
+                        if (!isset($decoded['fields']) || !is_array($decoded['fields'])) {
+                            $fail('Custom fields configuration must contain a "fields" array.');
+                        }
+
+                        // Check if fields array is not empty
+                        if (isset($decoded['fields']) && empty($decoded['fields'])) {
+                            $fail('Custom fields configuration must contain at least one field.');
+                        }
+
+                        // Validate each field has required properties
+                        if (isset($decoded['fields']) && is_array($decoded['fields'])) {
+                            foreach ($decoded['fields'] as $index => $field) {
+                                if (!isset($field['key'])) {
+                                    $fail("Field at index {$index} is missing required 'key' property.");
+                                }
+                                if (!isset($field['label'])) {
+                                    $fail("Field at index {$index} is missing required 'label' property.");
+                                }
+                                if (!isset($field['type'])) {
+                                    $fail("Field at index {$index} is missing required 'type' property.");
+                                }
+                            }
+                        }
+                    }
+                },
+            ],
         ];
     }
 
@@ -68,6 +116,7 @@ class StoreServiceRequest extends FormRequest
             'category_id.exists' => 'The selected service category is invalid.',
             'status.required' => 'The service status is required.',
             'status.in' => 'The service status must be active, inactive, or discontinued.',
+            'custom_fields_config.json' => 'The custom fields configuration must be valid JSON.',
         ];
     }
 
@@ -81,6 +130,9 @@ class StoreServiceRequest extends FormRequest
             'short_description' => $this->short_description ?: null,
             'cost' => $this->cost ?: 0,
             'category_id' => $this->category_id ?: null,
+            'service_type' => $this->service_type ?: 'standard',
+            'has_custom_fields' => $this->has('has_custom_fields') ? (bool) $this->has_custom_fields : false,
+            'custom_fields_config' => $this->custom_fields_config ? json_decode($this->custom_fields_config, true) : null,
         ]);
     }
 }

@@ -7,6 +7,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class OrderItem extends Model
 {
@@ -61,6 +63,22 @@ class OrderItem extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * Get the service field data for the order item.
+     */
+    public function fieldData(): HasMany
+    {
+        return $this->hasMany(ServiceFieldData::class);
+    }
+
+    /**
+     * Get the appointment for the order item (if service is appointment type).
+     */
+    public function appointment(): HasOne
+    {
+        return $this->hasOne(Appointment::class);
     }
 
     /**

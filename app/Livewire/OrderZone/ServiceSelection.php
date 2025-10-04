@@ -89,6 +89,8 @@ class ServiceSelection extends Component
                 'price' => $service->price,
                 'quantity' => $quantity,
                 'total' => $service->price * $quantity,
+                'has_custom_fields' => $service->hasCustomFields(),
+                'service_type' => $service->service_type,
             ];
         }
 

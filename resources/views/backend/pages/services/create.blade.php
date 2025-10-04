@@ -86,7 +86,56 @@
                             :value="old('status', 'active')"
                         />
 
+                        <!-- Service Type -->
+                        <x-inputs.select
+                            name="service_type"
+                            label="{{ __('Service Type') }}"
+                            :options="[
+                                'standard' => __('Standard Service'),
+                                'appointment' => __('Appointment Service')
+                            ]"
+                            required
+                            :value="old('service_type', 'standard')"
+                            help="{{ __('Select appointment type if this service requires scheduling') }}"
+                        />
+                    </div>
+                </div>
 
+                <!-- Custom Fields Configuration (for appointment services) -->
+                <div class="border-t border-gray-200 pt-6" x-data="{ showCustomFields: {{ old('service_type') === 'appointment' ? 'true' : 'false' }} }">
+                    <div class="mb-4 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-base font-medium text-gray-900">{{ __('Custom Fields Configuration') }}</h4>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Configure additional fields required for this service') }}</p>
+                        </div>
+                        <label class="flex items-center">
+                            <input
+                                type="checkbox"
+                                name="has_custom_fields"
+                                value="1"
+                                x-model="showCustomFields"
+                                @checked(old('has_custom_fields'))
+                                class="form-checkbox h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span class="ml-2 text-sm text-gray-700">{{ __('Enable Custom Fields') }}</span>
+                        </label>
+                    </div>
+
+                    <div x-show="showCustomFields" x-transition class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                        <div class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                            <div class="flex">
+                                <iconify-icon icon="lucide:sparkles" class="mr-2 h-5 w-5 flex-shrink-0 text-blue-600"></iconify-icon>
+                                <div>
+                                    <p class="text-sm font-medium text-blue-800">{{ __('Visual Form Builder') }}</p>
+                                    <p class="mt-1 text-sm text-blue-700">
+                                        {{ __('Build your custom fields visually - no coding required! Click "Add Field" or use a quick template.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Form Builder Component -->
+                        <x-form-builder name="custom_fields_config" :value="old('custom_fields_config')" />
                     </div>
                 </div>
 

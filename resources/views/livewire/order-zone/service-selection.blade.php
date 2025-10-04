@@ -124,4 +124,18 @@
             </div>
         </div>
     </div>
+
+    <!-- Next Button -->
+    @if(count($selectedServices) > 0)
+        <div class="flex justify-end">
+            <button
+                type="button"
+                onclick="window.dispatchEvent(new CustomEvent('go-to-step', { detail: { step: 2 } }))"
+                class="btn-primary"
+            >
+                {{ __('Next') }}
+                <iconify-icon icon="lucide:arrow-right" class="ml-2 h-5 w-5"></iconify-icon>
+            </button>
+        </div>
+    @endif
 </div>
