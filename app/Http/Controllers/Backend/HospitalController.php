@@ -85,6 +85,8 @@ class HospitalController extends Controller
     {
         $this->authorize('hospital.edit');
 
+        $hospital->load('doctors');
+
         $breadcrumbs = [
             ['label' => __('Dashboard'), 'url' => route('admin.dashboard')],
             ['label' => __('Hospitals'), 'url' => route('admin.hospitals.index')],

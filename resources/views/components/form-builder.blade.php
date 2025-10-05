@@ -99,6 +99,7 @@
                     <select x-model="field.data_source" @change="updateJson()" class="form-control">
                         <option value="">{{ __('-- Manual Options --') }}</option>
                         <option value="hospitals">{{ __('Hospitals') }}</option>
+                        <option value="doctors">{{ __('Doctors') }}</option>
                     </select>
                     <div class="text-xs text-gray-400 mt-1">{{ __('Load options from database') }}</div>
                 </div>
@@ -275,6 +276,7 @@ function formBuilder(initialValue) {
                     { key: 'appointment_type', label: 'Appointment Type', type: 'select', required: true, options: [{value: 'self', label: 'Self'}, {value: 'someone_else', label: 'Someone Else'}] },
                     { key: 'patient_name', label: 'Patient Name', type: 'text', required: true, show_if: {field: 'appointment_type', value: 'someone_else'} },
                     { key: 'hospital_id', label: 'Select Hospital', type: 'select', required: true, data_source: 'hospitals' },
+                    { key: 'doctor_id', label: 'Select Doctor', type: 'select', required: true, data_source: 'doctors' },
                     { key: 'appointment_time', label: 'Appointment Date & Time', type: 'datetime', required: true, validation: 'future' }
                 ],
                 lab_test: [

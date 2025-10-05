@@ -49,6 +49,10 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
     // Hospitals Routes.
     Route::resource('hospitals', App\Http\Controllers\Backend\HospitalController::class);
 
+    // Doctors Routes.
+    Route::resource('doctors', App\Http\Controllers\Backend\DoctorController::class);
+    Route::get('doctors-by-hospital/{hospital}', [App\Http\Controllers\Backend\DoctorController::class, 'getDoctorsByHospital'])->name('doctors.by-hospital');
+
     // Appointments Routes.
     Route::get('appointments', [App\Http\Controllers\Backend\AppointmentController::class, 'index'])->name('appointments.index');
     Route::get('appointments/{appointment}', [App\Http\Controllers\Backend\AppointmentController::class, 'show'])->name('appointments.show');

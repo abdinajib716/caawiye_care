@@ -96,6 +96,9 @@
                 ],
 
                 init() {
+                    // Initialize step notification
+                    Livewire.dispatch('step-changed', { step: this.currentStep });
+
                     // Listen for services updated to check for custom fields
                     Livewire.on('services-updated', (data) => {
                         this.checkForCustomFields(data[0].services || []);
@@ -117,6 +120,7 @@
                         this.currentStep = 1;
                         this.hasCustomFieldServices = false;
                         this.updateSteps();
+                        Livewire.dispatch('step-changed', { step: 1 });
                     });
 
                     // Listen for custom go-to-step event
@@ -151,6 +155,8 @@
 
                 goToStep(step) {
                     this.currentStep = step;
+                    // Notify OrderPreview component about step change
+                    Livewire.dispatch('step-changed', { step: step });
                 }
             }
         }

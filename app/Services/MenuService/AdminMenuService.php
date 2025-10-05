@@ -193,6 +193,32 @@ class AdminMenuService
             ],
         ]);
 
+        // Doctors Management
+        $this->addMenuItem([
+            'label' => __('Doctors'),
+            'icon' => 'lucide:stethoscope',
+            'id' => 'doctors-submenu',
+            'active' => Route::is('admin.doctors.*'),
+            'priority' => 17,
+            'permissions' => 'doctor.view',
+            'children' => [
+                [
+                    'label' => __('All Doctors'),
+                    'route' => route('admin.doctors.index'),
+                    'active' => Route::is('admin.doctors.index') || Route::is('admin.doctors.show'),
+                    'priority' => 10,
+                    'permissions' => 'doctor.view',
+                ],
+                [
+                    'label' => __('Add Doctor'),
+                    'route' => route('admin.doctors.create'),
+                    'active' => Route::is('admin.doctors.create'),
+                    'priority' => 20,
+                    'permissions' => 'doctor.create',
+                ],
+            ],
+        ]);
+
         // Appointments Management
         $this->addMenuItem([
             'label' => __('Appointments'),
@@ -200,7 +226,7 @@ class AdminMenuService
             'route' => route('admin.appointments.index'),
             'active' => Route::is('admin.appointments.*'),
             'id' => 'appointments',
-            'priority' => 17,
+            'priority' => 18,
             'permissions' => 'appointment.view',
         ]);
 

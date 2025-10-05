@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Hospital;
+namespace App\Http\Requests\Doctor;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreHospitalRequest extends FormRequest
+class UpdateDoctorRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return $this->user()->can('hospital.create');
+        return $this->user()->can('doctor.edit');
     }
 
     /**
@@ -24,16 +24,21 @@ class StoreHospitalRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'address' => ['nullable', 'string', 'max:1000'],
+            'specialization' => ['nullable', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
+            'hospital_id' => ['required', 'integer', 'exists:hospitals,id'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
-            'doctors' => ['nullable', 'array'],
-            'doctors.*.name' => ['required', 'string', 'max:255'],
-            'doctors.*.specialization' => ['nullable', 'string', 'max:255'],
-            'doctors.*.phone' => ['nullable', 'string', 'max:20'],
-            'doctors.*.email' => ['nullable', 'email', 'max:255'],
-            'doctors.*.status' => ['required', Rule::in(['active', 'inactive'])],
+        ];
+    }
+
+    /**
+     * Get custom attribute names for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'hospital_id' => 'hospital',
         ];
     }
 
@@ -43,7 +48,7 @@ class StoreHospitalRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'address' => $this->address ?: null,
+            'specialization' => $this->specialization ?: null,
             'phone' => $this->phone ?: null,
             'email' => $this->email ?: null,
         ]);

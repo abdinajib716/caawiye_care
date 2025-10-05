@@ -28,6 +28,13 @@ class UpdateHospitalRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
+            'doctors' => ['nullable', 'array'],
+            'doctors.*.id' => ['nullable', 'integer', 'exists:doctors,id'],
+            'doctors.*.name' => ['required', 'string', 'max:255'],
+            'doctors.*.specialization' => ['nullable', 'string', 'max:255'],
+            'doctors.*.phone' => ['nullable', 'string', 'max:20'],
+            'doctors.*.email' => ['nullable', 'email', 'max:255'],
+            'doctors.*.status' => ['required', Rule::in(['active', 'inactive'])],
         ];
     }
 

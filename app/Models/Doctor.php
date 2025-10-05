@@ -7,10 +7,10 @@ namespace App\Models;
 use App\Concerns\QueryBuilderTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Hospital extends Model
+class Doctor extends Model
 {
     use HasFactory;
     use QueryBuilderTrait;
@@ -23,9 +23,10 @@ class Hospital extends Model
      */
     protected $fillable = [
         'name',
-        'address',
+        'specialization',
         'phone',
         'email',
+        'hospital_id',
         'status',
     ];
 
@@ -36,6 +37,7 @@ class Hospital extends Model
      */
     protected $casts = [
         'status' => 'string',
+        'hospital_id' => 'integer',
     ];
 
     /**
@@ -49,23 +51,15 @@ class Hospital extends Model
     ];
 
     /**
-     * Get the appointments for the hospital.
+     * Get the hospital that the doctor belongs to.
      */
-    public function appointments(): HasMany
+    public function hospital(): BelongsTo
     {
-        return $this->hasMany(Appointment::class);
+        return $this->belongsTo(Hospital::class);
     }
 
     /**
-     * Get the doctors for the hospital.
-     */
-    public function doctors(): HasMany
-    {
-        return $this->hasMany(Doctor::class);
-    }
-
-    /**
-     * Scope a query to only include active hospitals.
+     * Scope a query to only include active doctors.
      */
     public function scopeActive($query)
     {
@@ -73,13 +67,21 @@ class Hospital extends Model
     }
 
     /**
-     * Scope a query to search hospitals by name, address, or phone.
+     * Scope a query to filter doctors by hospital.
+     */
+    public function scopeByHospital($query, int $hospitalId)
+    {
+        return $query->where('hospital_id', $hospitalId);
+    }
+
+    /**
+     * Scope a query to search doctors by name, specialization, or phone.
      */
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('address', 'like', "%{$search}%")
+              ->orWhere('specialization', 'like', "%{$search}%")
               ->orWhere('phone', 'like', "%{$search}%")
               ->orWhere('email', 'like', "%{$search}%");
         });

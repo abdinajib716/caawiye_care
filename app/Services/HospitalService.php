@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Doctor;
 use App\Models\Hospital;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class HospitalService
 {
@@ -40,7 +42,24 @@ class HospitalService
      */
     public function createHospital(array $data): Hospital
     {
-        return Hospital::create($data);
+        return DB::transaction(function () use ($data) {
+            // Extract doctors data if present
+            $doctors = $data['doctors'] ?? [];
+            unset($data['doctors']);
+
+            // Create the hospital
+            $hospital = Hospital::create($data);
+
+            // Create associated doctors
+            if (!empty($doctors)) {
+                foreach ($doctors as $doctorData) {
+                    $doctorData['hospital_id'] = $hospital->id;
+                    Doctor::create($doctorData);
+                }
+            }
+
+            return $hospital->fresh('doctors');
+        });
     }
 
     /**
@@ -48,8 +67,42 @@ class HospitalService
      */
     public function updateHospital(Hospital $hospital, array $data): Hospital
     {
-        $hospital->update($data);
-        return $hospital->fresh();
+        return DB::transaction(function () use ($hospital, $data) {
+            // Extract doctors data if present
+            $doctors = $data['doctors'] ?? [];
+            unset($data['doctors']);
+
+            // Update the hospital
+            $hospital->update($data);
+
+            // Handle doctors
+            if (!empty($doctors)) {
+                $existingDoctorIds = [];
+
+                foreach ($doctors as $doctorData) {
+                    if (!empty($doctorData['id'])) {
+                        // Update existing doctor
+                        $doctor = Doctor::find($doctorData['id']);
+                        if ($doctor && $doctor->hospital_id === $hospital->id) {
+                            $doctor->update($doctorData);
+                            $existingDoctorIds[] = $doctor->id;
+                        }
+                    } else {
+                        // Create new doctor
+                        $doctorData['hospital_id'] = $hospital->id;
+                        $doctor = Doctor::create($doctorData);
+                        $existingDoctorIds[] = $doctor->id;
+                    }
+                }
+
+                // Delete doctors that were removed
+                Doctor::where('hospital_id', $hospital->id)
+                    ->whereNotIn('id', $existingDoctorIds)
+                    ->delete();
+            }
+
+            return $hospital->fresh('doctors');
+        });
     }
 
     /**

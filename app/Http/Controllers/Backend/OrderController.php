@@ -56,7 +56,7 @@ class OrderController extends Controller
                 'items' => [
                     ['label' => __('Dashboard'), 'url' => route('admin.dashboard')],
                     ['label' => __('Orders'), 'url' => route('admin.orders.index')],
-                    ['label' => __('Order #:number', ['number' => $order->order_number]), 'url' => null],
+                    ['label' => $order->order_number, 'url' => null],
                 ],
             ],
         ]);

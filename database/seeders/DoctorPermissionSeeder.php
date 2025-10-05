@@ -8,19 +8,19 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class HospitalPermissionSeeder extends Seeder
+class DoctorPermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // Define hospital permissions
+        // Define doctor permissions
         $permissions = [
-            'hospital.view',
-            'hospital.create',
-            'hospital.edit',
-            'hospital.delete',
+            'doctor.view',
+            'doctor.create',
+            'doctor.edit',
+            'doctor.delete',
         ];
 
         // Clear permission cache BEFORE creating new permissions
@@ -31,14 +31,14 @@ class HospitalPermissionSeeder extends Seeder
         foreach ($permissions as $permission) {
             Permission::firstOrCreate(
                 ['name' => $permission, 'guard_name' => 'web'],
-                ['group_name' => 'hospital']
+                ['group_name' => 'doctor']
             );
         }
 
         // Clear permission cache again to ensure new permissions are recognized
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Assign all hospital permissions to Superadmin role
+        // Assign all doctor permissions to Superadmin role
         $superAdminRole = Role::where('name', 'Superadmin')->first();
         if ($superAdminRole) {
             foreach ($permissions as $permission) {
@@ -49,7 +49,7 @@ class HospitalPermissionSeeder extends Seeder
         // Final cache clear
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $this->command->info('Hospital permissions created and assigned to Superadmin role.');
+        $this->command->info('Doctor permissions created and assigned to Superadmin role.');
     }
 }
 

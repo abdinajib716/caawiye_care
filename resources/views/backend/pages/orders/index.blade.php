@@ -39,91 +39,81 @@
     <div class="space-y-6">
 
         <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <!-- Total Orders -->
-            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ __('Total Orders') }}
-                        </p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format((int) $statistics['total_orders']) }}
-                        </p>
+            <x-card class="bg-white">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-blue-500 text-white">
+                            <iconify-icon icon="lucide:shopping-cart" class="h-5 w-5"></iconify-icon>
+                        </div>
                     </div>
-                    <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900/30">
-                        <iconify-icon icon="lucide:shopping-cart" class="h-6 w-6 text-blue-600 dark:text-blue-400"></iconify-icon>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-500">{{ __('Total Orders') }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ number_format((int) $statistics['total_orders']) }}</div>
                     </div>
                 </div>
-            </div>
+            </x-card>
 
             <!-- Pending Orders -->
-            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ __('Pending') }}
-                        </p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format((int) $statistics['pending_orders']) }}
-                        </p>
+            <x-card class="bg-white">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-yellow-500 text-white">
+                            <iconify-icon icon="lucide:clock" class="h-5 w-5"></iconify-icon>
+                        </div>
                     </div>
-                    <div class="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900/30">
-                        <iconify-icon icon="lucide:clock" class="h-6 w-6 text-yellow-600 dark:text-yellow-400"></iconify-icon>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-500">{{ __('Pending') }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ number_format((int) $statistics['pending_orders']) }}</div>
                     </div>
                 </div>
-            </div>
+            </x-card>
 
             <!-- Processing Orders -->
-            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ __('Processing') }}
-                        </p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format((int) $statistics['processing_orders']) }}
-                        </p>
+            <x-card class="bg-white">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-orange-500 text-white">
+                            <iconify-icon icon="lucide:loader-2" class="h-5 w-5"></iconify-icon>
+                        </div>
                     </div>
-                    <div class="rounded-full bg-orange-100 p-3 dark:bg-orange-900/30">
-                        <iconify-icon icon="lucide:loader-2" class="h-6 w-6 text-orange-600 dark:text-orange-400"></iconify-icon>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-500">{{ __('Processing') }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ number_format((int) $statistics['processing_orders']) }}</div>
                     </div>
                 </div>
-            </div>
+            </x-card>
 
             <!-- Completed Orders -->
-            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ __('Completed') }}
-                        </p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format((int) $statistics['completed_orders']) }}
-                        </p>
+            <x-card class="bg-white">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-green-500 text-white">
+                            <iconify-icon icon="lucide:check-circle" class="h-5 w-5"></iconify-icon>
+                        </div>
                     </div>
-                    <div class="rounded-full bg-green-100 p-3 dark:bg-green-900/30">
-                        <iconify-icon icon="lucide:check-circle" class="h-6 w-6 text-green-600 dark:text-green-400"></iconify-icon>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-500">{{ __('Completed') }}</div>
+                        <div class="text-2xl font-bold text-gray-900">{{ number_format((int) $statistics['completed_orders']) }}</div>
                     </div>
                 </div>
-            </div>
+            </x-card>
 
             <!-- Total Revenue -->
-            <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                            {{ __('Total Revenue') }}
-                        </p>
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                            ${{ number_format((float) $statistics['total_revenue'], 2) }}
-                        </p>
+            <x-card class="bg-white">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="flex h-8 w-8 items-center justify-center rounded-md bg-purple-500 text-white">
+                            <iconify-icon icon="lucide:dollar-sign" class="h-5 w-5"></iconify-icon>
+                        </div>
                     </div>
-                    <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900/30">
-                        <iconify-icon icon="lucide:dollar-sign" class="h-6 w-6 text-purple-600 dark:text-purple-400"></iconify-icon>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-500">{{ __('Total Revenue') }}</div>
+                        <div class="text-2xl font-bold text-gray-900">${{ number_format((float) $statistics['total_revenue'], 2) }}</div>
                     </div>
                 </div>
-            </div>
+            </x-card>
         </div>
 
         <!-- Orders Datatable -->

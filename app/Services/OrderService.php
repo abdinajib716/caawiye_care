@@ -174,7 +174,8 @@ class OrderService
                 'payment_phone' => $orderData['payment_phone'],
                 'payment_status' => 'completed', // Payment already completed
                 'payment_transaction_id' => $transaction->id,
-                'status' => 'processing', // Start as processing since payment is done
+                'status' => 'completed', // Mark as completed since payment is done
+                'completed_at' => now(), // Set completion timestamp
                 'notes' => $orderData['notes'] ?? null,
             ]);
 

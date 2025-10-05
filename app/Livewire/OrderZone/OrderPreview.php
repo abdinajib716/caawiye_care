@@ -21,6 +21,7 @@ class OrderPreview extends Component
     public float $total = 0;
     public bool $canProcess = false;
     public bool $processing = false;
+    public int $currentStep = 1;
 
     // Payment method settings
     public bool $waafipayEnabled = false;
@@ -79,6 +80,12 @@ class OrderPreview extends Component
     public function updateProvider($data)
     {
         $this->provider = $data['provider'] ?? null;
+    }
+
+    #[On('step-changed')]
+    public function updateCurrentStep($step)
+    {
+        $this->currentStep = $step;
     }
 
     public function calculateTotals()

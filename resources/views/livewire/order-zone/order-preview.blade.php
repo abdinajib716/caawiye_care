@@ -155,30 +155,32 @@
     <!-- Action Buttons -->
     <div class="flex flex-col gap-3">
         <div class="flex gap-3">
-            <!-- Back Button -->
-            <button
-                type="button"
-                @click="$dispatch('go-to-step', { step: 2 })"
-                @disabled($processing)
-                class="rounded-lg border border-gray-300 bg-white px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            >
-                <iconify-icon icon="lucide:arrow-left" class="mr-2 inline-block h-5 w-5"></iconify-icon>
-                {{ __('Back') }}
-            </button>
+            <!-- Back Button - Only show when not in step 1 -->
+            @if($currentStep > 1)
+                <button
+                    type="button"
+                    wire:click="$dispatch('go-to-step', { step: {{ $currentStep - 1 }} })"
+                    @disabled($processing)
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
+                    <iconify-icon icon="lucide:arrow-left" class="mr-1.5 inline-block h-4 w-4"></iconify-icon>
+                    {{ __('Back') }}
+                </button>
+            @endif
 
-            <!-- Pay Button -->
+            <!-- Pay Now Button - Improved UI/UX -->
             <button
                 type="button"
                 @click="$wire.showPaymentModal = true; $wire.processOrder()"
                 @disabled(!$canProcess || $processing)
-                class="flex-1 rounded-lg px-4 py-3 text-base font-medium !text-white focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {{ (!$canProcess || $processing) ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 dark:bg-green-500 dark:hover:bg-green-600' }}"
+                class="{{ $currentStep > 1 ? 'flex-1' : 'w-full' }} rounded-lg px-4 py-2.5 text-sm font-semibold !text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 {{ (!$canProcess || $processing) ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 dark:bg-green-500 dark:hover:bg-green-600' }}"
             >
                 @if($processing)
-                    <iconify-icon icon="lucide:loader-2" class="mr-2 inline-block h-5 w-5 animate-spin"></iconify-icon>
+                    <iconify-icon icon="lucide:loader-2" class="mr-2 inline-block h-4 w-4 animate-spin"></iconify-icon>
                     {{ __('Processing...') }}
                 @else
-                    <iconify-icon icon="lucide:credit-card" class="mr-2 inline-block h-5 w-5"></iconify-icon>
-                    {{ __('Pay $:amount', ['amount' => number_format($total, 2)]) }}
+                    <iconify-icon icon="lucide:credit-card" class="mr-2 inline-block h-4 w-4"></iconify-icon>
+                    {{ __('Pay Now') }} • ${{ number_format($total, 2) }}
                 @endif
             </button>
         </div>
