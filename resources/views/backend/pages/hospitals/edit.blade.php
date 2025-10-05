@@ -128,7 +128,7 @@
     <script>
         function hospitalForm() {
             return {
-                doctors: @json($hospital->doctors->map(function($doctor) {
+                doctors: {!! json_encode($hospital->doctors->map(function($doctor) {
                     return [
                         'id' => $doctor->id,
                         'name' => $doctor->name,
@@ -137,7 +137,7 @@
                         'email' => $doctor->email,
                         'status' => $doctor->status
                     ];
-                })),
+                })->values()) !!},
                 addDoctor() {
                     this.doctors.push({
                         id: null,

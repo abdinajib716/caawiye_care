@@ -208,7 +208,7 @@ class DoctorDatatable extends Datatable
         $html .= '</div>';
         $html .= '<div class="flex items-center justify-center gap-2 border-t border-gray-100 p-4 dark:border-gray-800">';
         $html .= '<button x-on:click="deleteModalOpen = false" class="btn-secondary">' . __('Cancel') . '</button>';
-        $html .= '<button wire:click="delete(' . $doctor->id . ')" x-on:click="deleteModalOpen = false" class="btn-danger">' . __('Delete') . '</button>';
+        $html .= '<button wire:click="deleteItem(' . $doctor->id . ')" x-on:click="deleteModalOpen = false" class="btn-danger">' . __('Delete') . '</button>';
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
