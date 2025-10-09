@@ -27,6 +27,9 @@ class Doctor extends Model
         'phone',
         'email',
         'hospital_id',
+        'appointment_cost',
+        'profit',
+        'total',
         'status',
     ];
 
@@ -38,6 +41,9 @@ class Doctor extends Model
     protected $casts = [
         'status' => 'string',
         'hospital_id' => 'integer',
+        'appointment_cost' => 'decimal:2',
+        'profit' => 'decimal:2',
+        'total' => 'decimal:2',
     ];
 
     /**

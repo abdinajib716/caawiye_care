@@ -55,6 +55,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth']], 
 
     // Appointments Routes.
     Route::get('appointments', [App\Http\Controllers\Backend\AppointmentController::class, 'index'])->name('appointments.index');
+    Route::get('appointments/create', [App\Http\Controllers\Backend\AppointmentController::class, 'create'])->name('appointments.create');
+    Route::post('appointments', [App\Http\Controllers\Backend\AppointmentController::class, 'store'])->name('appointments.store');
     Route::get('appointments/{appointment}', [App\Http\Controllers\Backend\AppointmentController::class, 'show'])->name('appointments.show');
     Route::post('appointments/{appointment}/reschedule', [App\Http\Controllers\Backend\AppointmentController::class, 'reschedule'])->name('appointments.reschedule');
     Route::post('appointments/{appointment}/cancel', [App\Http\Controllers\Backend\AppointmentController::class, 'cancel'])->name('appointments.cancel');

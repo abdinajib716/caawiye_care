@@ -245,13 +245,13 @@ class WaafipayService
                         'response' => $responseData,
                     ];
                 } elseif ($responseData['responseCode'] === '5310') {
-                    // Payment pending (waiting for customer approval)
-                    $transaction->markAsProcessing();
+                    // Payment rejected or cancelled by user - Mark as FAILED
+                    $errorMessage = $responseData['responseMsg'] ?? 'Payment rejected by user';
+                    $transaction->markAsFailed($errorMessage, $responseData);
                     
                     return [
-                        'success' => true,
-                        'pending' => true,
-                        'message' => 'Payment request sent. Waiting for customer approval.',
+                        'success' => false,
+                        'message' => $errorMessage,
                         'transaction' => $transaction,
                         'response' => $responseData,
                     ];

@@ -223,11 +223,26 @@ class AdminMenuService
         $this->addMenuItem([
             'label' => __('Appointments'),
             'icon' => 'lucide:calendar-check',
-            'route' => route('admin.appointments.index'),
+            'id' => 'appointments-submenu',
             'active' => Route::is('admin.appointments.*'),
-            'id' => 'appointments',
             'priority' => 18,
             'permissions' => 'appointment.view',
+            'children' => [
+                [
+                    'label' => __('Book Appointment'),
+                    'route' => route('admin.appointments.create'),
+                    'active' => Route::is('admin.appointments.create'),
+                    'priority' => 10,
+                    'permissions' => 'appointment.create',
+                ],
+                [
+                    'label' => __('All Appointments'),
+                    'route' => route('admin.appointments.index'),
+                    'active' => Route::is('admin.appointments.index') || Route::is('admin.appointments.show'),
+                    'priority' => 20,
+                    'permissions' => 'appointment.view',
+                ],
+            ],
         ]);
 
         // Order Zone - Quick Order Creation

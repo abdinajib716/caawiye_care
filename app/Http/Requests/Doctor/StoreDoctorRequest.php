@@ -28,6 +28,9 @@ class StoreDoctorRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'hospital_id' => ['required', 'integer', 'exists:hospitals,id'],
+            'appointment_cost' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'profit' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
+            'total' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ];
     }

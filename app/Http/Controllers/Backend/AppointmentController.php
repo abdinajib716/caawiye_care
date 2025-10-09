@@ -34,6 +34,37 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Show the form for creating a new appointment.
+     */
+    public function create(): View
+    {
+        $this->authorize('appointment.create');
+
+        $breadcrumbs = [
+            ['label' => __('Dashboard'), 'url' => route('admin.dashboard')],
+            ['label' => __('Appointments'), 'url' => route('admin.appointments.index')],
+            ['label' => __('Book Appointment'), 'url' => null],
+        ];
+
+        return view('backend.pages.appointments.create', compact('breadcrumbs'));
+    }
+
+    /**
+     * Store a newly created appointment in storage.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $this->authorize('appointment.create');
+
+        // Validation and creation logic will be handled by Livewire component
+        // This is a placeholder for direct form submission if needed
+
+        return redirect()
+            ->route('admin.appointments.index')
+            ->with('success', __('Appointment booked successfully'));
+    }
+
+    /**
      * Display the specified appointment.
      */
     public function show(Appointment $appointment): View

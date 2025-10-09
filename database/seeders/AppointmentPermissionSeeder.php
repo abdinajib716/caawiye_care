@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
-use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AppointmentPermissionSeeder extends Seeder
 {
@@ -18,22 +18,38 @@ class AppointmentPermissionSeeder extends Seeder
         // Define appointment permissions
         $permissions = [
             'appointment.view',
+            'appointment.create',
             'appointment.edit',
+            'appointment.delete',
         ];
 
-        // Create permissions
+        // Clear cache BEFORE creating (important!)
+        $this->command->info('Clearing permission cache...');
+        \Artisan::call('permission:clear-cache', ['--force' => true]);
+
+        // Create permissions with group_name
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(
+                ['name' => $permission, 'guard_name' => 'web'],
+                ['group_name' => 'appointment']
+            );
         }
 
-        // Assign all appointment permissions to Super Admin role
-        $superAdminRole = Role::where('name', 'Super Admin')->first();
+        // Clear cache after creating
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Assign to Superadmin role
+        $superAdminRole = Role::where('name', 'Superadmin')->first();
         if ($superAdminRole) {
-            $permissionIds = Permission::whereIn('name', $permissions)->pluck('id')->toArray();
-            $superAdminRole->permissions()->syncWithoutDetaching($permissionIds);
+            foreach ($permissions as $permission) {
+                $superAdminRole->givePermissionTo($permission);
+            }
         }
 
-        $this->command->info('Appointment permissions created and assigned to Super Admin role.');
+        // Final cache clear
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $this->command->info('Appointment permissions created successfully.');
     }
 }
 

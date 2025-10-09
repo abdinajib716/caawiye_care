@@ -15,8 +15,22 @@
     'helpText' => '',
 ])
 
-<div x-data="{
+<div wire:ignore x-data="{
+    fpInstance: null,
     init() {
+        this.initFlatpickr();
+        
+        // Re-initialize after Livewire updates
+        window.addEventListener('livewire:update', () => {
+            if (this.fpInstance) {
+                this.fpInstance.destroy();
+            }
+            setTimeout(() => {
+                this.initFlatpickr();
+            }, 100);
+        });
+    },
+    initFlatpickr() {
         const options = {
             enableTime: {{ $enableTime ? 'true' : 'false' }},
             dateFormat: '{{ $dateFormat }}',
@@ -27,16 +41,17 @@
             minDate: {{ $minDate ? '\'' . $minDate . '\'' : 'null' }},
             maxDate: {{ $maxDate ? '\'' . $maxDate . '\'' : 'null' }},
             disableMobile: true,
-            static: true,
-            position: 'auto',
-            clickOpens: true,  // Ensure calendar opens on click
-            allowInput: false,  // Prevent manual input, force picker usage
+            static: false,
+            position: 'auto center',
+            clickOpens: true,
+            allowInput: false,
             locale: {
                 firstDayOfWeek: 1
             },
             onChange: function(selectedDates, dateStr, instance) {
-                // Dispatch an input event to ensure Alpine.js and other listeners are notified
                 instance.element.dispatchEvent(new Event('input', { bubbles: true }));
+                // Update Livewire model
+                @this.set('{{ $attributes->wire('model')->value() }}', dateStr);
             },
             // Fix for the form validation issue with unnamed inputs
             onReady: function(selectedDates, dateStr, instance) {
@@ -78,11 +93,13 @@
             }
         };
 
-        const fp = flatpickr(this.$refs.datetimePicker, options);
+        this.fpInstance = flatpickr(this.$refs.datetimePicker, options);
 
         // Additional safeguard: reopen calendar if user tries to edit
-        this.$refs.datetimePicker.addEventListener('focus', function() {
-            fp.open();
+        this.$refs.datetimePicker.addEventListener('focus', () => {
+            if (this.fpInstance) {
+                this.fpInstance.open();
+            }
         });
     }
 }">

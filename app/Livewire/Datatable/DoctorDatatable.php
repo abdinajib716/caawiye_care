@@ -26,6 +26,8 @@ class DoctorDatatable extends Datatable
         'specialization',
         'hospital_id',
         'phone',
+        'appointment_cost',
+        'total',
         'status',
         'created_at',
         'updated_at',
@@ -111,8 +113,24 @@ class DoctorDatatable extends Datatable
                 'id' => 'contact',
                 'title' => __('Contact'),
                 'sortable' => false,
-                'width' => 'w-1/5',
+                'width' => 'w-1/6',
                 'renderContent' => 'renderContactColumn',
+            ],
+            [
+                'id' => 'cost',
+                'title' => __('Cost'),
+                'sortable' => true,
+                'sortBy' => 'appointment_cost',
+                'width' => 'w-1/12',
+                'renderContent' => 'renderCostColumn',
+            ],
+            [
+                'id' => 'total',
+                'title' => __('Total'),
+                'sortable' => true,
+                'sortBy' => 'total',
+                'width' => 'w-1/12',
+                'renderContent' => 'renderTotalColumn',
             ],
             [
                 'id' => 'status',
@@ -159,6 +177,18 @@ class DoctorDatatable extends Datatable
         $html .= '</div>';
 
         return $html;
+    }
+
+    public function renderCostColumn($doctor): string
+    {
+        $cost = (float) ($doctor->appointment_cost ?? 0);
+        return '<div class="text-sm font-medium text-gray-900">$' . number_format($cost, 2) . '</div>';
+    }
+
+    public function renderTotalColumn($doctor): string
+    {
+        $total = (float) ($doctor->total ?? 0);
+        return '<div class="text-sm font-semibold text-green-600">$' . number_format($total, 2) . '</div>';
     }
 
     public function renderStatusColumn($doctor): string

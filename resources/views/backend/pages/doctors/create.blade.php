@@ -50,6 +50,37 @@
                             :value="old('hospital_id')"
                         />
 
+                        <x-inputs.input
+                            name="appointment_cost"
+                            label="{{ __('Appointment Cost') }}"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="{{ __('Enter appointment cost') }}"
+                            :value="old('appointment_cost', '0.00')"
+                        />
+
+                        <x-inputs.input
+                            name="profit"
+                            label="{{ __('Profit/Commission') }}"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="{{ __('Enter profit amount') }}"
+                            :value="old('profit', '0.00')"
+                        />
+
+                        <x-inputs.input
+                            name="total"
+                            label="{{ __('Total') }}"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="{{ __('Total amount') }}"
+                            :value="old('total', '0.00')"
+                            readonly
+                        />
+
                         <x-inputs.select
                             name="status"
                             label="{{ __('Status') }}"
@@ -75,5 +106,28 @@
             </form>
         </x-card>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const costInput = document.querySelector('input[name="appointment_cost"]');
+            const profitInput = document.querySelector('input[name="profit"]');
+            const totalInput = document.querySelector('input[name="total"]');
+
+            function calculateTotal() {
+                const cost = parseFloat(costInput.value) || 0;
+                const profit = parseFloat(profitInput.value) || 0;
+                const total = cost + profit;
+                totalInput.value = total.toFixed(2);
+            }
+
+            if (costInput && profitInput && totalInput) {
+                costInput.addEventListener('input', calculateTotal);
+                profitInput.addEventListener('input', calculateTotal);
+                calculateTotal(); // Initial calculation
+            }
+        });
+    </script>
+    @endpush
 </x-layouts.backend-layout>
 
