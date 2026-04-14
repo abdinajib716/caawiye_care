@@ -164,36 +164,19 @@
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-6">{{ __('Customer Information') }}</h3>
 
         <div class="space-y-6">
-            <!-- Customer Search -->
-            <div>
-                <label class="form-label">{{ __('Search Customer') }}</label>
-                <input type="text" wire:model.live.debounce.300ms="customerSearch" class="form-control" placeholder="{{ __('Search by name or phone number') }}">
-            </div>
-
-            <!-- Matching Customers -->
-            @if (!empty($matchingCustomers))
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg divide-y dark:divide-gray-700">
-                    @foreach ($matchingCustomers as $customer)
-                        <button type="button" wire:click="selectCustomer({{ $customer['id'] }})" class="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                            <div class="font-medium text-gray-900 dark:text-white">{{ $customer['name'] }}</div>
-                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ $customer['phone'] }}</div>
-                        </button>
-                    @endforeach
-                </div>
-            @endif
-
-            <!-- Selected Customer Display -->
-            @if ($customerId && !$showNewCustomerForm)
-                <div class="alert alert-success">
-                    <div class="flex items-start">
-                        <iconify-icon icon="lucide:check-circle" class="h-5 w-5 mt-0.5"></iconify-icon>
-                        <div class="ml-3">
-                            <h4 class="text-sm font-medium">{{ __('Customer Selected') }}</h4>
-                            <p class="text-sm mt-1">{{ $customerName }}</p>
-                            <p class="text-sm">{{ $customerPhone }}</p>
-                        </div>
-                    </div>
-                </div>
+            @if (!$showNewCustomerForm)
+                <!-- Customer Searchable Dropdown -->
+                <x-livewire-searchable-select
+                    :label="__('Search Customer')"
+                    :placeholder="__('Select a customer')"
+                    searchModel="customerSearch"
+                    :options="$matchingCustomers"
+                    :selectedValue="$customerId"
+                    :selectedDisplay="$customerName ? $customerName . ' (' . $customerPhone . ')' : ''"
+                    onSelect="selectCustomer"
+                    :required="true"
+                    icon="lucide:user"
+                />
             @endif
 
             <!-- New Customer Form Toggle -->

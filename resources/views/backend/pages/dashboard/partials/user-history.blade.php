@@ -2,30 +2,22 @@
     <div class="flex justify-between">
         <div class="flex justify-center items-center">
             <h5 class="text-lg font-semibold leading-none text-gray-700 dark:text-white pe-1">
-                {{ __('Users History') }}
+                {{ __('Active Workload') }}
             </h5>
-        </div>
-        <div>
-            <button type="button" data-tooltip-target="data-tooltip" data-tooltip-placement="bottom"
-                onclick="window.location.href='{{ route('admin.users.index') }}'"
-                class="hidden sm:inline-flex items-center justify-center text-gray-500 w-8 h-8 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-md text-sm">
-            </button>
         </div>
     </div>
 
-    <!-- Donut Chart -->
     <div class="" id="donut-chart"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get user counts from controller data
-            const newUsers = @json($user_history_data['new_users'] ?? 0);
-            const oldUsers = @json($user_history_data['old_users'] ?? 0);
+            const workloadLabels = @json($workload_chart_data['labels'] ?? []);
+            const workloadData = @json($workload_chart_data['data'] ?? []);
 
             const getChartOptions = () => {
                 return {
-                    series: [oldUsers, newUsers], // Old Users, New Users
-                    colors: ["#f3f4f6", "#6366f1"], // Slight gray and Indigo
+                    series: workloadData,
+                    colors: ["#4f46e5", "#0ea5e9", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444"],
                     chart: {
                         height: 320,
                         width: "100%",
@@ -52,7 +44,7 @@
                                         label: "{{ __('Total') }}",
                                         formatter: function(w) {
                                             const sum = w.globals.seriesTotals.reduce((a, b) => a + b, 0)
-                                            return sum + " {{ __('users') }}"
+                                            return sum + " {{ __('items') }}"
                                         },
                                     },
                                     value: {
@@ -60,7 +52,7 @@
                                         fontFamily: "var(--font-sans)",
                                         offsetY: -20,
                                         formatter: function(value) {
-                                            return value + " {{ __('users') }}"
+                                            return value + " {{ __('items') }}"
                                         },
                                     },
                                 },
@@ -73,10 +65,7 @@
                             top: -2,
                         },
                     },
-                    labels: [
-                        "{{ __('Old Users (before 1 month)') }}",
-                        "{{ __('New Users (last 30 days)') }}"
-                    ],
+                    labels: workloadLabels,
                     dataLabels: {
                         enabled: false,
                     },
@@ -87,14 +76,14 @@
                     yaxis: {
                         labels: {
                             formatter: function(value) {
-                                return value + " users"
+                                return value + " items"
                             },
                         },
                     },
                     xaxis: {
                         labels: {
                             formatter: function(value) {
-                                return value + " users"
+                                return value + " items"
                             },
                         },
                         axisTicks: {

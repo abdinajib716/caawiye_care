@@ -9,7 +9,12 @@ use App\Http\Requests\Hospital\StoreHospitalRequest;
 use App\Http\Requests\Hospital\UpdateHospitalRequest;
 use App\Models\Hospital;
 use App\Services\HospitalService;
+use App\Services\ExcelExportService;
+use App\Services\ExcelImportService;
+use App\Exports\HospitalExport;
+use App\Imports\HospitalImport;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HospitalController extends Controller
@@ -121,6 +126,35 @@ class HospitalController extends Controller
         return redirect()
             ->route('admin.hospitals.index')
             ->with('success', __('Hospital deleted successfully'));
+    }
+
+    public function export(ExcelExportService $exportService)
+    {
+        $this->authorize('viewAny', Hospital::class);
+        $export = new HospitalExport();
+        return $exportService->exportToCsv($export->data(), $export->headers(), $export->filename());
+    }
+
+    public function import(Request $request, ExcelImportService $importService)
+    {
+        $this->authorize('create', Hospital::class);
+        $request->validate(['file' => 'required|file|mimes:csv,txt|max:5120']);
+        $import = new HospitalImport();
+        $missingHeaders = $importService->getMissingHeaders($request->file('file'), $import->requiredHeaders());
+        if (!empty($missingHeaders)) {
+            return response()->json(['success' => 0, 'errors' => 1, 'error_details' => [['row' => 0, 'errors' => ['Missing required headers: ' . implode(', ', $missingHeaders)]]]], 422);
+        }
+        $result = $importService->importFromCsv($request->file('file'), $import->rules(), function ($data, $rowNumber) use ($import) {
+            $import->processRow($data, $rowNumber);
+        });
+        return response()->json($result);
+    }
+
+    public function downloadSampleTemplate(ExcelExportService $exportService)
+    {
+        $this->authorize('viewAny', Hospital::class);
+        $export = new HospitalExport();
+        return $exportService->generateSampleTemplate($export->headers(), $export->sampleData(), 'hospitals');
     }
 }
 

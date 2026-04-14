@@ -31,11 +31,6 @@ class VerifyRecaptcha
             return $next($request);
         }
 
-        // Skip verification in demo mode if configured
-        if (config('app.demo_mode', false) && config('app.skip_recaptcha_in_demo', true)) {
-            return $next($request);
-        }
-
         // Verify reCAPTCHA with action based on page.
         if (! $this->recaptchaService->verify($request, $page)) {
             return back()->withErrors([

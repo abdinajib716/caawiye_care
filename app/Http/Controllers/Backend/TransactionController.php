@@ -44,7 +44,7 @@ class TransactionController extends Controller
      */
     public function show(PaymentTransaction $transaction): View
     {
-        $transaction->load(['customer', 'order.items.service', 'order.agent']);
+        $transaction->load(['customer', 'order.items', 'order.agent']);
 
         return view('backend.pages.transactions.show', [
             'transaction' => $transaction,

@@ -46,10 +46,33 @@ trait HasActionLogTrait
         // Prepare the data
         $data = [];
 
-        // If a model is provided, convert it to an array
+        // If a model is provided, convert it to an array with filtered sensitive fields
         if ($model !== null) {
             $modelType = strtolower(class_basename($model));
-            $data[$modelType] = $model;
+            
+            // Get model attributes and filter out sensitive data
+            $modelData = $model->toArray();
+            $sensitiveFields = [
+                'password',
+                'remember_token',
+                'email_verified_at',
+                'avatar_id',
+                'avatar_url',
+                'two_factor_secret',
+                'two_factor_recovery_codes',
+            ];
+            
+            // Filter out sensitive fields
+            $filteredData = collect($modelData)->except($sensitiveFields)->toArray();
+            
+            // Only include essential fields to prevent large logs
+            $essentialFields = ['id', 'name', 'first_name', 'last_name', 'email', 'username', 'phone', 'status', 'created_at', 'updated_at'];
+            $data[$modelType] = collect($filteredData)->only($essentialFields)->filter()->toArray();
+            
+            // If no essential fields found, include filtered data (limited to 10 fields)
+            if (empty($data[$modelType])) {
+                $data[$modelType] = array_slice($filteredData, 0, 10);
+            }
         }
 
         // Merge with additional data if provided

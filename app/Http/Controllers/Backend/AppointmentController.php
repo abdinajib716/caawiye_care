@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Services\AppointmentService;
+use App\Services\PdfExportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AppointmentController extends Controller
 {
@@ -30,7 +32,16 @@ class AppointmentController extends Controller
             ['label' => __('Appointments'), 'url' => null],
         ];
 
-        return view('backend.pages.appointments.index', compact('breadcrumbs'));
+        // Get appointment statistics
+        $statistics = [
+            'total_appointments' => Appointment::count(),
+            'scheduled_appointments' => Appointment::where('status', 'scheduled')->count(),
+            'confirmed_appointments' => Appointment::where('status', 'confirmed')->count(),
+            'completed_appointments' => Appointment::where('status', 'completed')->count(),
+            'cancelled_appointments' => Appointment::where('status', 'cancelled')->count(),
+        ];
+
+        return view('backend.pages.appointments.index', compact('breadcrumbs', 'statistics'));
     }
 
     /**
@@ -70,6 +81,8 @@ class AppointmentController extends Controller
     public function show(Appointment $appointment): View
     {
         $this->authorize('appointment.view');
+
+        $appointment->load(['customer', 'hospital', 'order']);
 
         $breadcrumbs = [
             ['label' => __('Dashboard'), 'url' => route('admin.dashboard')],
@@ -149,5 +162,50 @@ class AppointmentController extends Controller
             ->back()
             ->with('success', __('Appointment completed successfully'));
     }
-}
 
+    /**
+     * Export appointments to PDF
+     */
+    public function exportPdf(Request $request, PdfExportService $pdfService): BinaryFileResponse
+    {
+        $this->authorize('appointment.view');
+
+        // Get filtered appointments
+        $query = Appointment::with(['customer', 'hospital']);
+        
+        // Apply filters if present
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+        
+        if ($request->has('search') && $request->search) {
+            $query->where('patient_name', 'like', '%' . $request->search . '%');
+        }
+
+        $appointments = $query->get();
+
+        // Generate PDF
+        $pdfPath = $pdfService->generateAppointmentsPdf($appointments);
+
+        // Download PDF
+        return $pdfService->downloadPdf($pdfPath, 'appointments-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Export single appointment booking to PDF
+     */
+    public function exportBookingPdf(Appointment $appointment, PdfExportService $pdfService): BinaryFileResponse
+    {
+        $this->authorize('appointment.view');
+
+        // Load relationships
+        $appointment->load(['customer', 'hospital', 'order', 'orderItem']);
+
+        // Generate PDF
+        $pdfPath = $pdfService->generateAppointmentBookingPdf($appointment);
+
+        // Download PDF
+        $filename = 'appointment-booking-' . $appointment->id . '-' . now()->format('Y-m-d') . '.pdf';
+        return $pdfService->downloadPdf($pdfPath, $filename);
+    }
+}

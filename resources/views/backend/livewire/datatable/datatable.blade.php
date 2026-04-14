@@ -12,4 +12,11 @@
     :newResourceLinkRouteName="$newResourceLinkRouteName"
     :newResourceLinkRouteUrl="$this->getCreateRouteUrl()"
     :newResourceLinkLabel="$newResourceLinkLabel"
+    :pdfRoute="$pdfRoute ?? null"
+    :exportRoute="$exportRoute ?? null"
+    :importRoute="$importRoute ?? null"
+    :enablePdf="$enablePdf ?? true"
+    :enablePrint="$enablePrint ?? true"
+    :enableExport="$enableExport ?? false"
+    :enableImport="$enableImport ?? false"
 />

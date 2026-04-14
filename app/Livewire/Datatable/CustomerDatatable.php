@@ -44,6 +44,12 @@ class CustomerDatatable extends Datatable
         'deactivate' => 'Deactivate Selected',
         'delete' => 'Delete Selected',
     ];
+    
+    // Export/Import Configuration
+    public bool $enablePdf = false;
+    public bool $enablePrint = false;
+    public bool $enableExport = true;
+    public bool $enableImport = true;
 
     public function query(): Builder
     {
@@ -71,6 +77,9 @@ class CustomerDatatable extends Datatable
             'create' => 'admin.customers.create',
             'show' => 'admin.customers.show',
             'edit' => 'admin.customers.edit',
+            'export' => 'admin.customers.export',
+            'import' => 'admin.customers.import',
+            'sampleTemplate' => 'admin.customers.sample-template',
             'destroy' => 'admin.customers.destroy',
         ];
     }

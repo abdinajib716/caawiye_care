@@ -95,19 +95,28 @@ class EnvWriter
                     $envKey = $availableKeys[$key];
                     $currentValue = $this->get($envKey);
 
-                    // Normalize the current value by stripping surrounding quotes
-                    $normalizedCurrentValue = trim($currentValue, '"');
+                    // Normalize both values for proper comparison
+                    $normalizedCurrentValue = trim(trim($currentValue, '"'), "'");
+                    $normalizedNewValue = trim((string) $value);
 
-                    // Skip writing if the normalized value hasn't changed or is null
-                    if ($normalizedCurrentValue === (string) $value || $value === null) {
+                    // Skip if value is null or empty string submitted (but allow '0' and other falsy values)
+                    if ($value === null || ($value === '' && $key !== 'mail_encryption')) {
                         continue;
                     }
 
-                    $formattedValue = "\"$value\"";
-                    $file = preg_replace("/^$envKey=.*/m", "$envKey=$formattedValue", $file);
+                    // Skip writing if the normalized values are identical
+                    if ($normalizedCurrentValue === $normalizedNewValue) {
+                        continue;
+                    }
 
-                    if (! preg_match("/^$envKey=/m", $file)) {
-                        $file .= PHP_EOL."$envKey=$formattedValue";
+                    // Format the value with quotes (escape existing quotes)
+                    $formattedValue = '"' . str_replace('"', '\\"', $normalizedNewValue) . '"';
+                    
+                    // Update or add the key
+                    if (preg_match("/^$envKey=/m", $file)) {
+                        $file = preg_replace("/^$envKey=.*/m", "$envKey=$formattedValue", $file);
+                    } else {
+                        $file .= PHP_EOL . "$envKey=$formattedValue";
                     }
 
                     $changesMade = true;
@@ -116,14 +125,24 @@ class EnvWriter
 
             // Write to the file only if changes were made
             if ($changesMade) {
-                $fp = fopen($path, 'c+');
-                if (flock($fp, LOCK_EX)) {
-                    ftruncate($fp, 0);
-                    fwrite($fp, $file);
-                    fflush($fp);
-                    flock($fp, LOCK_UN);
+                // Use file_put_contents with LOCK_EX for atomic write
+                $bytesWritten = file_put_contents($path, $file, LOCK_EX);
+                
+                if ($bytesWritten === false) {
+                    \Log::error('EnvWriter: Failed to write to .env file', [
+                        'error' => error_get_last(),
+                        'path' => $path,
+                        'is_writable' => is_writable($path)
+                    ]);
                 }
-                fclose($fp);
+                
+                // Force PHP to reload the .env file
+                if (function_exists('opcache_reset')) {
+                    opcache_reset();
+                }
+                
+                // Clear file status cache
+                clearstatcache(true, $path);
             }
         } catch (\Throwable $th) {
             $this->storeActionLog(ActionType::EXCEPTION, [

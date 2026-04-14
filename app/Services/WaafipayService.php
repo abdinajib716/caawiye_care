@@ -120,7 +120,7 @@ class WaafipayService
      */
     public function generateReferenceId(): string
     {
-        return 'REF-' . date('YmdHis') . '-' . strtoupper(Str::random(6));
+        return app(\App\Services\SequentialIdService::class)->generateTransactionReference();
     }
 
     /**

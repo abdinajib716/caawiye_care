@@ -1,10 +1,9 @@
 @php $currentFilter = request()->get('chart_filter_period', 'last_6_months'); @endphp
 
 <div class="rounded-md shadow-sm border border-gray-200 dark:border-gray-700 p-4 py-6 z-1 bg-white dark:bg-gray-800">
-    <!-- Header Section -->
     <div class="flex justify-between items-center">
         <h3 class="text-lg font-semibold text-gray-700 dark:text-white">
-            {{ __('User Growth') }}
+            {{ __('Revenue Trend') }}
         </h3>
         <div class="flex gap-2 items-center">
             <span
@@ -70,7 +69,5 @@
         </div>
     </div>
 
-    <!-- Chart Section with ApexCharts - Increased height -->
     <div class="h-60" id="user-growth-chart"></div>
 </div>
-

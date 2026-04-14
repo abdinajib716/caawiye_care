@@ -277,7 +277,7 @@ class AppointmentBookingForm extends Component
             $appointmentCost = (float) ($this->selectedDoctor->total ?? 0);
             
             $order = Order::create([
-                'order_number' => 'APT-' . time(),
+                'order_number' => app(\App\Services\SequentialIdService::class)->generateAppointmentOrderNumber(),
                 'customer_id' => $this->customerId,
                 'agent_id' => auth()->id(),
                 'subtotal' => $appointmentCost,

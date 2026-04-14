@@ -25,6 +25,26 @@
                     <iconify-icon icon="lucide:printer" class="mr-2 h-4 w-4"></iconify-icon>
                     {{ __('Print Receipt') }}
                 </button>
+                @php
+                    $activeRefund = $order->refunds->first(fn ($refund) => $refund->status !== 'rejected');
+                @endphp
+                @if($activeRefund)
+                    <a
+                        href="{{ route('admin.refunds.show', $activeRefund) }}"
+                        class="inline-flex items-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600"
+                    >
+                        <iconify-icon icon="lucide:receipt-text" class="mr-2 h-4 w-4"></iconify-icon>
+                        {{ __('View Refund') }}
+                    </a>
+                @elseif($order->canBeRefunded())
+                    <a
+                        href="{{ route('admin.refunds.create', ['order_type' => get_class($order), 'order_id' => $order->id]) }}"
+                        class="inline-flex items-center rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600"
+                    >
+                        <iconify-icon icon="lucide:rotate-ccw" class="mr-2 h-4 w-4"></iconify-icon>
+                        {{ __('Initiate Refund') }}
+                    </a>
+                @endif
             </div>
         </div>
 
@@ -176,7 +196,7 @@
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Hospital') }}</p>
-                                        <p class="font-medium text-gray-900 dark:text-white">{{ $appointment->hospital->name }}</p>
+                                        <p class="font-medium text-gray-900 dark:text-white">{{ $appointment->hospital?->name ?? __('Not assigned') }}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Appointment Time') }}</p>
@@ -262,11 +282,11 @@
                     <div class="space-y-3">
                         <div>
                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Created By') }}</p>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ $order->agent->name }}</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ $order->agent?->full_name ?: __('System') }}</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-600 dark:text-gray-400">{{ __('Email') }}</p>
-                            <p class="font-medium text-gray-900 dark:text-white">{{ $order->agent->email }}</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ $order->agent?->email ?? __('N/A') }}</p>
                         </div>
                     </div>
                 </div>
@@ -325,4 +345,3 @@
     </style>
     @endpush
 </x-layouts.backend-layout>
-

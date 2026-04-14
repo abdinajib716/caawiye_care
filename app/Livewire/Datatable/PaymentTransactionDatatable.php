@@ -291,5 +291,45 @@ class PaymentTransactionDatatable extends Datatable
         ';
     }
 
+    public function bulkDelete(): void
+    {
+        $this->authorize('transaction.delete');
+
+        $ids = $this->selectedItems;
+
+        if (empty($ids)) {
+            $this->dispatch('show-toast', [
+                'message' => __('No transactions selected'),
+                'type' => 'warning',
+            ]);
+            return;
+        }
+
+        try {
+            $deletedCount = PaymentTransaction::whereIn('id', $ids)->delete();
+
+            if ($deletedCount === 0) {
+                $this->dispatch('show-toast', [
+                    'message' => __('No transactions were deleted. Selected items may include protected records.'),
+                    'type' => 'error',
+                ]);
+            } else {
+                $this->dispatch('show-toast', [
+                    'message' => __(':count transactions deleted successfully', ['count' => $deletedCount]),
+                    'type' => 'success',
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('show-toast', [
+                'message' => __('Failed to delete transactions: :error', ['error' => $e->getMessage()]),
+                'type' => 'error',
+            ]);
+        }
+
+        // Reset selected items
+        $this->selectedItems = [];
+        $this->dispatch('resetSelectedItems');
+    }
+
 }
 

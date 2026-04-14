@@ -1,10 +1,6 @@
 {!! Hook::applyFilters(AdminFilterHook::HEADER_RIGHT_MENU_BEFORE, '') !!}
 
 <div class="flex items-center gap-1">
-    <div class="hidden md:block">
-        @include('backend.layouts.partials.demo-mode-notice')
-    </div>
-
     {!! Hook::applyFilters(AdminFilterHook::HEADER_BEFORE_LOCALE_SWITCHER, '') !!}
     <x-tooltip title="{{ __('Change locale') }}" position="bottom">
         @include('backend.layouts.partials.locale-switcher')
@@ -23,32 +19,10 @@
     </x-tooltip>
     {!! Hook::applyFilters(AdminFilterHook::DARK_MODE_TOGGLER_AFTER_BUTTON, '') !!}
 
-    @if (config('app.show_demo_component_preview', false))
-        <x-tooltip title="{{ __('Preview demo components') }}" position="bottom">
-            <a href="{{ route('demo.preview') }}" class="hover:text-dark-900 relative flex p-2 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white">
-                <iconify-icon icon="lucide:view" width="22" height="22"></iconify-icon>
-            </a>
-        </x-tooltip>
-    @endif
-
-    {{-- Compact Date and Time Display --}}
-    <div class="flex items-center text-xs text-gray-600 dark:text-gray-400 mr-2">
-        <div class="hidden md:flex items-center gap-3">
-            <div class="flex items-center gap-1">
-                <iconify-icon icon="lucide:calendar" width="14" height="14"></iconify-icon>
-                <span id="current-date" class="font-medium">{{ now()->format('D, M j') }}</span>
-            </div>
-            <div class="flex items-center gap-1">
-                <iconify-icon icon="lucide:clock" width="14" height="14"></iconify-icon>
-                <span id="current-time">{{ now()->format('h:i A') }}</span>
-            </div>
-        </div>
-
-        {{-- Mobile: Show only time --}}
-        <div class="md:hidden flex items-center gap-1">
-            <iconify-icon icon="lucide:clock" width="14" height="14"></iconify-icon>
-            <span id="mobile-time">{{ now()->format('h:i A') }}</span>
-        </div>
+    {{-- Date and Time Display --}}
+    <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mr-2 whitespace-nowrap">
+        <iconify-icon icon="lucide:calendar" width="14" height="14" class="hidden sm:block flex-shrink-0"></iconify-icon>
+        <span id="current-datetime" class="font-medium whitespace-nowrap">{{ now()->format('D, M j') }}</span>
     </div>
 
     {!! Hook::applyFilters(AdminFilterHook::HEADER_AFTER_ACTIONS, '') !!}

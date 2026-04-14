@@ -37,7 +37,7 @@ trait AuthorizationChecker
     }
 
     /**
-     * Prevent modification of the super admin in demo mode.
+     * Prevent modification of the super admin (permission check only).
      *
      * @param  User  $user
      * @param  string|array  $additionalPermission
@@ -45,24 +45,17 @@ trait AuthorizationChecker
     public function preventSuperAdminModification(User|Authenticatable|null $user = null, $additionalPermission = 'user.edit'): void
     {
         if ($user && ! $this->canBeModified($user, $additionalPermission)) {
-            abort(403, 'Superadmin cannot be modified in demo mode.');
+            abort(403, 'You do not have permission to modify this user.');
         }
     }
 
     public function canBeModified(User $user, $additionalPermission = 'user.edit'): bool
     {
-        $isSuperAdmin = $user->email === 'superadmin@example.com' || $user->username === 'Superadmin';
-        if (config('app.demo_mode') && $isSuperAdmin) {
-            return false;
-        }
-
         return auth()->user()->can($additionalPermission);
     }
 
     public function preventSuperAdminRoleModification(Role $role, string $action = 'modified'): void
     {
-        if (config('app.demo_mode') && $role->name == 'Superadmin') {
-            abort(403, "The Superadmin role can not be {$action}.");
-        }
+        // Permission check is handled by authorization policies
     }
 }

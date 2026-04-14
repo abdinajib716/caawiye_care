@@ -7,7 +7,7 @@
 >
     {!! $beforeActionView !!}
 
-    @if (isset($routes['view']) && $routes['view'] ?? false && $componentPermissions['view'] ?? false)
+    @if (($routes['view'] ?? $routes['show'] ?? false) && $componentPermissions['view'] ?? false)
         <x-buttons.action-item
             :href="$viewRouteUrl"
             :icon="$viewButtonIcon"
@@ -27,7 +27,7 @@
 
     {!! $afterActionEdit !!}
 
-    @if (isset($routes['delete']) && $routes['delete'] ?? false && (($componentPermissions['delete'] === true) || auth()->user()->can('delete', $item)))
+    @if (($routes['delete'] ?? $routes['destroy'] ?? false) && (($componentPermissions['delete'] === true) || auth()->user()->can('delete', $item)))
         <div x-data="{ deleteModalOpen: false }">
             <x-buttons.action-item
                 type="modal-trigger"

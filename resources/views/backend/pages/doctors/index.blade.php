@@ -7,7 +7,7 @@
             </x-slot>
 
             <!-- Doctors Datatable -->
-            <livewire:datatable.doctor-datatable />
+            <livewire:datatable.doctor-datatable lazy />
         </x-card>
     </div>
 </x-layouts.backend-layout>

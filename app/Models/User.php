@@ -133,9 +133,22 @@ class User extends Authenticatable
      */
     public function getAvatarUrlAttribute(): string
     {
-        // For healthcare application, we'll use Gravatar only
-        // Avatar uploads can be implemented later with a simpler approach
+        // Check if user has uploaded avatar
+        $uploadedAvatar = $this->userMeta()->where('meta_key', 'avatar_url')->value('meta_value');
+        if ($uploadedAvatar) {
+            return $uploadedAvatar;
+        }
+        
+        // Fallback to UI Avatars
         return $this->getGravatarUrl();
+    }
+
+    /**
+     * Get a metadata value by key.
+     */
+    public function getMetaValue(string $key, $default = null)
+    {
+        return $this->userMeta()->where('meta_key', $key)->value('meta_value') ?? $default;
     }
 
     /**

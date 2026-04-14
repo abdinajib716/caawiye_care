@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Backend\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
-use App\Services\DemoAppService;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -28,10 +27,6 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
-    public function __construct(private readonly DemoAppService $demoAppService)
-    {
-    }
-
     /**
      * Where to redirect users after login.
      *
@@ -45,25 +40,18 @@ class LoginController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        $this->demoAppService->maybeSetDemoLocaleToEnByDefault();
-
-        $email = app()->environment('local') ? 'superadmin@example.com' : '';
-        $password = app()->environment('local') ? '12345678' : '';
-
-        return view('backend.auth.login')->with(compact('email', 'password'));
+        return view('backend.auth.login');
     }
 
     public function login(LoginRequest $request): RedirectResponse|Response
     {
         if (Auth::guard('web')->attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
-            $this->demoAppService->maybeSetDemoLocaleToEnByDefault();
             session()->flash('success', 'Successfully Logged in!');
 
             return redirect()->route('admin.dashboard');
         }
 
         if (Auth::guard('web')->attempt(['username' => $request->email, 'password' => $request->password], $request->remember)) {
-            $this->demoAppService->maybeSetDemoLocaleToEnByDefault();
             session()->flash('success', 'Successfully Logged in!');
 
             return redirect()->route('admin.dashboard');

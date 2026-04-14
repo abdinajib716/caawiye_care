@@ -9,9 +9,14 @@ use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Models\Customer;
 use App\Services\CustomerService;
+use App\Services\ExcelExportService;
+use App\Services\ExcelImportService;
+use App\Exports\CustomerExport;
+use App\Imports\CustomerImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\UploadedFile;
 
 class CustomerController extends Controller
 {
@@ -182,5 +187,79 @@ class CustomerController extends Controller
                 'count' => $updatedCount,
                 'status' => $statusLabel
             ]));
+    }
+
+    /**
+     * Export customers to CSV
+     */
+    public function export(ExcelExportService $exportService)
+    {
+        $this->authorize('viewAny', Customer::class);
+
+        $export = new CustomerExport();
+        
+        return $exportService->exportToCsv(
+            $export->data(),
+            $export->headers(),
+            $export->filename()
+        );
+    }
+
+    /**
+     * Import customers from CSV
+     */
+    public function import(Request $request, ExcelImportService $importService)
+    {
+        $this->authorize('create', Customer::class);
+
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:5120', // 5MB max
+        ]);
+
+        $import = new CustomerImport();
+        
+        // Validate CSV structure
+        $missingHeaders = $importService->getMissingHeaders(
+            $request->file('file'),
+            $import->requiredHeaders()
+        );
+
+        if (!empty($missingHeaders)) {
+            return response()->json([
+                'success' => 0,
+                'errors' => 1,
+                'error_details' => [[
+                    'row' => 0,
+                    'errors' => ['Missing required headers: ' . implode(', ', $missingHeaders)]
+                ]]
+            ], 422);
+        }
+
+        // Process import
+        $result = $importService->importFromCsv(
+            $request->file('file'),
+            $import->rules(),
+            function ($data, $rowNumber) use ($import) {
+                $import->processRow($data, $rowNumber);
+            }
+        );
+
+        return response()->json($result);
+    }
+
+    /**
+     * Download sample template
+     */
+    public function downloadSampleTemplate(ExcelExportService $exportService)
+    {
+        $this->authorize('viewAny', Customer::class);
+
+        $export = new CustomerExport();
+        
+        return $exportService->generateSampleTemplate(
+            $export->headers(),
+            $export->sampleData(),
+            'customers'
+        );
     }
 }

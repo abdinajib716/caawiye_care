@@ -21,6 +21,17 @@
     'newResourceLinkLabel' => __('Create New'),
     'customNewResourceLink' => null,
 
+    // Export/Import Actions
+    'enableExportActions' => true,
+    'enablePdf' => true,
+    'enablePrint' => true,
+    'enableExport' => true,
+    'enableImport' => true,
+    'pdfRoute' => null,
+    'printRoute' => null,
+    'exportRoute' => null,
+    'importRoute' => null,
+
     'data' => [],
     'enableCheckbox' => true,
     'noResultsMessage' => __('No data found.'),
@@ -286,6 +297,20 @@
                             @endforeach
                         @endif
                     @endif
+                @endif
+
+                {{-- Export/Import Actions --}}
+                @if($enableExportActions)
+                    <x-datatable.export-actions
+                        :enablePdf="$enablePdf"
+                        :enablePrint="$enablePrint"
+                        :enableExport="$enableExport"
+                        :enableImport="$enableImport"
+                        :pdfRoute="$pdfRoute"
+                        :printRoute="$printRoute"
+                        :exportRoute="$exportRoute"
+                        :importRoute="$importRoute"
+                    />
                 @endif
 
                 @if($enableNewResourceLink)

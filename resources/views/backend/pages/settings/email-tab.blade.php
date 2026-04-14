@@ -1,30 +1,28 @@
 @php
-    // BEST PRACTICE: Force fresh values using direct env() calls to prevent caching issues
-    // Based on Spatie Laravel Settings and other popular packages
+    // Read fresh values directly from .env file to prevent caching
+    $envPath = base_path('.env');
+    $envContent = file_get_contents($envPath);
+    
+    // Helper function to parse .env values
+    $parseEnvValue = function($key) use ($envContent) {
+        if (preg_match("/^{$key}=(.*)$/m", $envContent, $matches)) {
+            $value = trim($matches[1]);
+            // Remove surrounding quotes
+            $value = trim($value, '"\'');
+            return $value;
+        }
+        return '';
+    };
 
-    // Clear any potential session interference
-    if (session()->has('settings_updated')) {
-        session()->forget(['_old_input', '_flash.old']);
-    }
-
-    // Read directly from .env file (highest priority) with fallbacks
-    $currentMailer = env('MAIL_MAILER', config('mail.default', 'smtp'));
-    $currentHost = env('MAIL_HOST', config('mail.mailers.smtp.host', ''));
-    $currentPort = env('MAIL_PORT', config('mail.mailers.smtp.port', 587));
-    $currentUsername = env('MAIL_USERNAME', config('mail.mailers.smtp.username', ''));
-    $currentPassword = env('MAIL_PASSWORD', config('mail.mailers.smtp.password', ''));
-    $currentEncryption = env('MAIL_ENCRYPTION', config('mail.mailers.smtp.encryption', ''));
-    $currentFromAddress = env('MAIL_FROM_ADDRESS', config('mail.from.address', ''));
-    $currentFromName = env('MAIL_FROM_NAME', config('mail.from.name', config('app.name', 'Laravel')));
-
-    // Ensure values are strings and handle null cases properly
-    $currentHost = (string) $currentHost;
-    $currentPort = (string) $currentPort;
-    $currentUsername = (string) $currentUsername;
-    $currentPassword = (string) $currentPassword;
-    $currentEncryption = (string) $currentEncryption;
-    $currentFromAddress = (string) $currentFromAddress;
-    $currentFromName = (string) $currentFromName;
+    // Get current values from .env file
+    $currentMailer = $parseEnvValue('MAIL_MAILER') ?: 'smtp';
+    $currentHost = $parseEnvValue('MAIL_HOST');
+    $currentPort = $parseEnvValue('MAIL_PORT') ?: '587';
+    $currentUsername = $parseEnvValue('MAIL_USERNAME');
+    $currentPassword = $parseEnvValue('MAIL_PASSWORD');
+    $currentEncryption = $parseEnvValue('MAIL_ENCRYPTION') ?: 'tls';
+    $currentFromAddress = $parseEnvValue('MAIL_FROM_ADDRESS');
+    $currentFromName = $parseEnvValue('MAIL_FROM_NAME') ?: config('app.name', 'Laravel');
 @endphp
 
 {!! Hook::applyFilters(SettingFilterHook::SETTINGS_EMAIL_TAB_BEFORE_SECTION_START->value, '') !!}
@@ -36,20 +34,6 @@
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {{ __('Configure email settings for your application') }}
         </p>
-        {{-- Debug info to verify current values --}}
-        <div class="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-700 dark:text-blue-300">
-            <div class="flex justify-between items-start">
-                <div>
-                    <strong>Debug - Current Values:</strong>
-                    Host={{ $currentHost }}, Port={{ $currentPort }}, User={{ $currentUsername ?: 'empty' }},
-                    From={{ $currentFromAddress ?: 'empty' }}, Name={{ $currentFromName }}
-                    <br><small>Timestamp: {{ now()->format('Y-m-d H:i:s') }}</small>
-                </div>
-                <button type="button" onclick="refreshFormValues()" class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">
-                    Refresh Values
-                </button>
-            </div>
-        </div>
     </div>
     <div class="space-y-6 border-t border-gray-100 p-5 sm:p-6 dark:border-gray-800">
         
@@ -211,56 +195,14 @@
 
 @push('scripts')
 <script>
-// BEST PRACTICE: Force form values refresh after save (based on popular Laravel packages)
-function refreshFormValues() {
-    // Clear browser cache and force reload with fresh data
-    if ('caches' in window) {
-        caches.keys().then(names => {
-            names.forEach(name => {
-                caches.delete(name);
-            });
-        });
-    }
-
-    // Add cache-busting parameters
-    const timestamp = new Date().getTime();
-    const currentUrl = new URL(window.location);
-    currentUrl.searchParams.set('_t', timestamp);
-    currentUrl.searchParams.set('_refresh', '1');
-
-    // Force reload with no-cache headers
-    window.location.replace(currentUrl.toString());
-}
-
-// Monitor for successful form submission and refresh
+// Clean up URL parameters after successful save
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if we just saved settings successfully
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('_refresh')) {
-        // Remove the refresh parameter from URL
-        urlParams.delete('_refresh');
-        urlParams.delete('_t');
+    if (urlParams.has('t')) {
+        // Remove timestamp parameter from URL for cleaner address bar
+        urlParams.delete('t');
         const cleanUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
         window.history.replaceState({}, '', cleanUrl);
-    }
-
-    // Listen for form submission success
-    const settingsForm = document.querySelector('form[action*="settings"]');
-    if (settingsForm) {
-        settingsForm.addEventListener('submit', function(e) {
-            // Store form data to compare after redirect
-            const formData = new FormData(settingsForm);
-            sessionStorage.setItem('lastFormSubmission', JSON.stringify(Object.fromEntries(formData)));
-        });
-    }
-
-    // Check if we returned from a successful submission
-    if (sessionStorage.getItem('lastFormSubmission')) {
-        sessionStorage.removeItem('lastFormSubmission');
-        // Force refresh of form values by reloading inputs
-        setTimeout(() => {
-            location.reload();
-        }, 100);
     }
 });
 

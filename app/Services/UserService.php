@@ -112,6 +112,21 @@ class UserService
     private function prepareUserDataWithAvatar(array $data, bool $isCreate = true, ?User $existingUser = null): array
     {
         $userData = $this->prepareUserData($data, $isCreate);
+        
+        // Handle avatar file upload
+        if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
+            $imageService = app(\App\Services\ImageService::class);
+            $avatarUrl = $imageService->storeImageAndGetUrl($data, 'avatar', 'uploads/avatars');
+            
+            if ($avatarUrl) {
+                // Delete old avatar if exists
+                if ($existingUser && $existingUser->getMetaValue('avatar_url')) {
+                    $imageService->deleteImageFromPublic($existingUser->getMetaValue('avatar_url'));
+                }
+                $userData['avatar_url'] = $avatarUrl;
+            }
+        }
+        
         $userData['avatar_id'] = $data['avatar_id'] ?? ($existingUser?->avatar_id);
 
         return $userData;
@@ -125,7 +140,7 @@ class UserService
     private function updateUserAttributes(User $user, array $userData): void
     {
         foreach ($userData as $key => $value) {
-            if ($value !== null) {
+            if ($value !== null && $key !== 'avatar_url') {
                 $user->$key = $value;
             }
         }
@@ -146,7 +161,7 @@ class UserService
     private function getUserMetadataFieldGroups(): array
     {
         return [
-            'profile' => ['display_name', 'bio', 'timezone', 'locale'],
+            'profile' => ['display_name', 'bio', 'timezone', 'locale', 'avatar_url'],
             'social' => ['social_facebook', 'social_x', 'social_youtube', 'social_linkedin', 'social_website'],
         ];
     }

@@ -49,14 +49,47 @@
     {{-- Profile Picture Section --}}
     @if($showImage)
     <div class="w-full md:w-1/5 flex-shrink-0 flex flex-col items-center gap-4">
-        <div class="w-full flex flex-col items-center">
-            <div class="mt-2 w-full flex justify-center">
-                {{-- Simplified avatar display for healthcare application --}}
-                <div class="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-semibold">
-                    {{ $emptyText }}
+        <div class="w-full flex flex-col items-center" x-data="{ 
+            imageUrl: '{{ $avatarUrl }}', 
+            showUpload: false,
+            previewImage(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.imageUrl = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }">
+            <div class="mt-2 w-full flex flex-col items-center">
+                {{-- Avatar display with upload --}}
+                <div class="relative group">
+                    <template x-if="imageUrl">
+                        <img :src="imageUrl" alt="Avatar" class="w-32 h-32 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700">
+                    </template>
+                    <template x-if="!imageUrl">
+                        <div class="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-semibold border-4 border-gray-200 dark:border-gray-700">
+                            {{ $emptyText }}
+                        </div>
+                    </template>
+                    
+                    {{-- Upload overlay --}}
+                    <label for="avatar-upload" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <iconify-icon icon="lucide:camera" class="w-8 h-8 text-white"></iconify-icon>
+                    </label>
+                    <input 
+                        type="file" 
+                        id="avatar-upload" 
+                        name="avatar" 
+                        accept="image/*" 
+                        class="hidden" 
+                        @change="previewImage"
+                    >
                 </div>
                 <p class="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
-                    {{ __('Avatar uploads will be available in future updates') }}
+                    {{ __('Click to upload avatar') }}
                 </p>
             </div>
             {!! Hook::applyFilters(UserFilterHook::USER_FORM_AFTER_AVATAR, '') !!}

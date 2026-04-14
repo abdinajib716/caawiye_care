@@ -17,7 +17,6 @@
                     name="recaptcha_site_key"
                     id="recaptcha_site_key"
                     placeholder="{{ __('Enter your reCAPTCHA site key') }}"
-                    @if (config('app.demo_mode', false)) disabled @endif
                     class="form-control pr-14"
                     value="{{ config('settings.recaptcha_site_key') ?? '' }}"
                 />
@@ -27,12 +26,6 @@
                     <iconify-icon icon="lucide:copy" width="18" height="18"></iconify-icon>
                 </button>
             </div>
-
-            @if (config('app.demo_mode', false))
-            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ __('Editing this field is disabled in demo mode.') }}
-            </div>
-            @endif
         </div>
 
         <div class="relative">
@@ -45,14 +38,8 @@
                 :value="config('settings.recaptcha_secret_key') ?? ''"
                 placeholder="{{ __('Enter your reCAPTCHA secret key') }}"
                 :required="false"
-                :disabled="config('app.demo_mode', false)"
                 :showTooltip="__('Show reCAPTCHA secret')"
             />
-            @if (config('app.demo_mode', false))
-            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ __('Editing this field is disabled in demo mode.') }}
-            </div>
-            @endif
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -65,7 +52,6 @@
                     name="recaptcha_score_threshold"
                     id="recaptcha_score_threshold"
                     placeholder="{{ __('0.5') }}"
-                    @if (config('app.demo_mode', false)) disabled @endif
                     class="form-control"
                     value="{{ config('settings.recaptcha_score_threshold', '0.5') }}"
                     min="0" max="1" step="0.1"
@@ -73,12 +59,6 @@
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {{ __('Set the minimum score (0.0-1.0) required to pass reCAPTCHA v3 verification. Default: 0.5') }}
                 </p>
-
-                @if (config('app.demo_mode', false))
-                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {{ __('Editing this field is disabled in demo mode.') }}
-                </div>
-                @endif
             </div>
             <div class="relative">
                 <label class="form-label" for="recaptcha_badge_position">
@@ -91,7 +71,6 @@
                     name="recaptcha_badge_position"
                     id="recaptcha_badge_position"
                     class="form-control"
-                    @if (config('app.demo_mode', false)) disabled @endif
                 >
                     <option value="left" @if($badgePosition === 'left') selected @endif>{{ __('Left Corner') }}</option>
                     <option value="right" @if($badgePosition === 'right') selected @endif>{{ __('Right Corner') }}</option>
@@ -99,11 +78,6 @@
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {{ __('Choose where the reCAPTCHA badge appears on the screen.') }}
                 </p>
-                @if (config('app.demo_mode', false))
-                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    {{ __('Editing this field is disabled in demo mode.') }}
-                </div>
-                @endif
             </div>
         </div>
 
@@ -121,18 +95,11 @@
                 <label class="flex items-center">
                     <input type="checkbox" name="recaptcha_enabled_pages[]" value="{{ $page }}"
                         @if(in_array($page, $enabledPages)) checked @endif
-                        @if (config('app.demo_mode', false)) disabled @endif
                         class="form-checkbox rounded border-gray-300 text-brand-600 shadow-sm focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700">
                     <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">{{ $label }}</span>
                 </label>
                 @endforeach
             </div>
-
-            @if (config('app.demo_mode', false))
-            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                {{ __('Editing these options are disabled in demo mode.') }}
-            </div>
-            @endif
 
             <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">
                 {{ __('Learn more about Google reCAPTCHA and how to set it up:') }}

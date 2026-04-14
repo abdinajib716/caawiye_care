@@ -75,6 +75,9 @@ x-init="
     </div>
 
     <x-toast-notifications />
+    
+    {{-- Page Loading Spinner --}}
+    <x-page-loader />
 
     {!! Hook::applyFilters(AdminFilterHook::ADMIN_FOOTER_BEFORE, '') !!}
 
@@ -86,32 +89,16 @@ x-init="
             const now = new Date();
 
             // Format options for compact display
-            const compactDateOptions = {
+            const dateOptions = {
                 weekday: 'short',
                 month: 'short',
                 day: 'numeric'
             };
-            const timeOptions = {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
-            };
 
-            // Update desktop date/time
-            const currentDate = document.getElementById('current-date');
-            const currentTime = document.getElementById('current-time');
-
-            if (currentDate) {
-                currentDate.textContent = now.toLocaleDateString('en-US', compactDateOptions);
-            }
-            if (currentTime) {
-                currentTime.textContent = now.toLocaleTimeString('en-US', timeOptions);
-            }
-
-            // Update mobile time only
-            const mobileTime = document.getElementById('mobile-time');
-            if (mobileTime) {
-                mobileTime.textContent = now.toLocaleTimeString('en-US', timeOptions);
+            // Update date display
+            const currentDatetime = document.getElementById('current-datetime');
+            if (currentDatetime) {
+                currentDatetime.textContent = now.toLocaleDateString('en-US', dateOptions);
             }
         }
 

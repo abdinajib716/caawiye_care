@@ -53,22 +53,7 @@ class SettingController extends Controller
     {
         $this->authorize('manage', Setting::class);
 
-        // Restrict specific fields in demo mode.
-        if (config('app.demo_mode', false)) {
-            $restrictedFields = Hook::applyFilters(SettingFilterHook::SETTINGS_RESTRICTED_FIELDS, [
-                'app_name',
-                'google_analytics_script',
-                'recaptcha_site_key',
-                'recaptcha_secret_key',
-                'recaptcha_enabled_pages',
-                'recaptcha_score_threshold',
-                'admin_login_route',
-                'disable_default_admin_redirect',
-            ]);
-            $fields = $request->except($restrictedFields);
-        } else {
-            $fields = $request->all();
-        }
+        $fields = $request->all();
 
         // Validate admin login route if provided
         if ($request->has('admin_login_route')) {
@@ -84,11 +69,6 @@ class SettingController extends Controller
         // Handle checkbox fields that might not be present when unchecked
         $checkboxFields = ['disable_default_admin_redirect', 'waafipay_enabled'];
         foreach ($checkboxFields as $checkboxField) {
-            // Skip restricted fields in demo mode
-            if (config('app.demo_mode', false) && in_array($checkboxField, $restrictedFields ?? [])) {
-                continue;
-            }
-
             if (! isset($fields[$checkboxField]) && $request->has('_token')) {
                 // If the form was submitted but checkbox wasn't checked, set to 0
                 $fields[$checkboxField] = '0';
@@ -119,16 +99,25 @@ class SettingController extends Controller
             // Email fields will be handled by batchWriteKeysToEnvFile below
         }
 
+        // Write to .env file FIRST before clearing cache
         $this->envWriter->batchWriteKeysToEnvFile($fields);
 
         // Clear ALL caches to ensure updated values are reflected immediately
         \Artisan::call('config:clear');
-        \Artisan::call('view:clear');
         \Artisan::call('cache:clear');
+        \Artisan::call('view:clear');
 
         // Force refresh of environment variables (production servers)
         if (function_exists('opcache_reset')) {
             opcache_reset();
+        }
+        
+        // Force reload .env values (Laravel 10+ compatible)
+        try {
+            $dotenv = \Dotenv\Dotenv::createImmutable(base_path());
+            $dotenv->load();
+        } catch (\Exception $e) {
+            // Silently continue if reload fails
         }
 
         $this->storeActionLog(ActionType::UPDATED, [
@@ -141,9 +130,19 @@ class SettingController extends Controller
         // Use PRG pattern (Post-Redirect-Get) with explicit tab parameter
         // Preserve the current tab from the request
         $currentTab = $request->input('current_tab', 'general');
-        return redirect()->route('admin.settings.index', ['tab' => $currentTab])
+        
+        // Add timestamp to force fresh page load
+        return redirect()->route('admin.settings.index', [
+            'tab' => $currentTab,
+            't' => time()
+        ])
             ->with('success', 'Settings saved successfully!')
-            ->with('settings_updated', true);
+            ->with('settings_updated', true)
+            ->withHeaders([
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
     }
 
     /**

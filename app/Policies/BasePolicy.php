@@ -40,20 +40,4 @@ abstract class BasePolicy
         return $user->id === $resource->user_id;
     }
 
-    /**
-     * Check if the resource can be modified (demo mode check).
-     */
-    protected function canBeModifiedInDemoMode($resource): bool
-    {
-        if (! config('app.demo_mode')) {
-            return true;
-        }
-
-        // Check if it's a protected resource in demo mode
-        if (method_exists($resource, 'isProtectedInDemoMode')) {
-            return ! $resource->isProtectedInDemoMode();
-        }
-
-        return true;
-    }
 }

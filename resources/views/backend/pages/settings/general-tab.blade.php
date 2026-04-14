@@ -12,7 +12,7 @@
                     {{ __('Site Name') }}
                 </label>
                 <input type="text" name="app_name" placeholder="{{ __('Enter site name') }}"
-                    value="{{ config('settings.app_name') ?? '' }}" @if (config('app.demo_mode', false)) disabled @endif
+                    value="{{ config('settings.app_name') ?? '' }}"
                     class="form-control" data-tooltip-target="tooltip-app-name">
                 <div id="tooltip-app-name" role="tooltip"
                     class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-md shadow-xs opacity-0 tooltip dark:bg-gray-700">
@@ -43,6 +43,19 @@
                         :existingAttachment="config('settings.site_logo_dark') !== '' && !empty(config('settings.site_logo_dark')) ? config('settings.site_logo_dark') : null"
                         :existingAltText="''"
                     />
+                </div>
+
+                <div class="mt-2">
+                    <x-inputs.file-input
+                        name="site_logo_full_light"
+                        id="site_logo_full_light"
+                        label="{{ __('Login Page Logo') }}"
+                        :existingAttachment="config('settings.site_logo_full_light') !== '' && !empty(config('settings.site_logo_full_light')) ? config('settings.site_logo_full_light') : null"
+                        :existingAltText="''"
+                    />
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-300">
+                        {{ __('Logo displayed on the right side of the login page') }}
+                    </p>
                 </div>
             </div>
 

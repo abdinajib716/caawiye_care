@@ -73,10 +73,14 @@ x-init="
 
                             <div class="flex flex-col items-center max-w-xs">
                                 <a href="#" class="block mb-4">
-                                    <img src="/images/logo/lara-dashboard-dark.png" alt="Logo">
+                                    @if(config('settings.site_logo_full_light'))
+                                        <img src="{{ config('settings.site_logo_full_light') }}" alt="{{ config('app.name') }}" class="h-16">
+                                    @else
+                                        <img src="/images/logo/lara-dashboard-dark.png" alt="{{ config('app.name') }}">
+                                    @endif
                                 </a>
                                 <p class="text-center text-gray-400 dark:text-white/60">
-                                    {{ __('Free and Open-Source Laravel Admin Dashboard Template') }}
+                                    {{ config('app.description', __('Healthcare Management System')) }}
                                 </p>
                             </div>
                         </div>

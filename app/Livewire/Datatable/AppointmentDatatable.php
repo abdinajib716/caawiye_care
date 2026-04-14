@@ -33,6 +33,7 @@ class AppointmentDatatable extends Datatable
             'index' => 'admin.appointments.index',
             'create' => 'admin.appointments.create',
             'show' => 'admin.appointments.show',
+            'exportPdf' => 'admin.appointments.export-pdf',
         ];
     }
 
@@ -163,6 +164,11 @@ class AppointmentDatatable extends Datatable
         // View button
         $html .= '<a href="' . route('admin.appointments.show', $appointment) . '" class="inline-flex items-center justify-center w-8 h-8 text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200" title="' . __('View Appointment') . '">';
         $html .= '<iconify-icon icon="lucide:eye" class="w-4 h-4"></iconify-icon>';
+        $html .= '</a>';
+
+        // PDF Download button
+        $html .= '<a href="' . route('admin.appointments.export-booking-pdf', $appointment) . '" class="inline-flex items-center justify-center w-8 h-8 text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors duration-200" title="' . __('Download PDF') . '" target="_blank">';
+        $html .= '<iconify-icon icon="lucide:file-text" class="w-4 h-4"></iconify-icon>';
         $html .= '</a>';
 
         $html .= '</div>';

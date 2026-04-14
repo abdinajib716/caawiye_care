@@ -49,6 +49,12 @@ abstract class Datatable extends Component
     public string $noResultsMessage = '';
     public string $customNoResultsMessage = '';
     public array $headers = [];
+    
+    // Export/Import Configuration
+    public bool $enablePdf = true;
+    public bool $enablePrint = true;
+    public bool $enableExport = false;
+    public bool $enableImport = false;
 
     public const QUERY_STRING_DEFAULTS = [
         'search' => ['except' => ''],
@@ -236,11 +242,13 @@ abstract class Datatable extends Component
     public function getViewRouteUrl($item): string
     {
         $routes = $this->getRoutes();
-        if (! isset($routes['view'])) {
+        $routeName = $routes['view'] ?? $routes['show'] ?? null;
+
+        if (! $routeName) {
             return '';
         }
 
-        return $this->getRouteUrl($routes['view'], $this->getItemRouteParameters($item));
+        return $this->getRouteUrl($routeName, $this->getItemRouteParameters($item));
     }
 
     public function getEditRouteUrl($item): string
@@ -256,11 +264,13 @@ abstract class Datatable extends Component
     public function getDeleteRouteUrl($item): string
     {
         $routes = $this->getRoutes();
-        if (! isset($routes['delete'])) {
+        $routeName = $routes['delete'] ?? $routes['destroy'] ?? null;
+
+        if (! $routeName) {
             return '';
         }
 
-        return $this->getRouteUrl($routes['delete'], $this->getItemRouteParameters($item));
+        return $this->getRouteUrl($routeName, $this->getItemRouteParameters($item));
     }
 
     public function getRoutes(): array
@@ -352,12 +362,20 @@ abstract class Datatable extends Component
     public function render(): Renderable
     {
         $this->headers = $this->getHeaders();
+        $routes = $this->getRoutes();
 
         return view('backend.livewire.datatable.datatable', [
             'headers' => $this->headers,
             'data' => $this->getData(),
             'perPage' => $this->perPage,
             'perPageOptions' => $this->perPageOptions,
+            'pdfRoute' => isset($routes['exportPdf']) ? route($routes['exportPdf']) : null,
+            'exportRoute' => isset($routes['export']) ? route($routes['export']) : null,
+            'importRoute' => isset($routes['import']) ? route($routes['import']) : null,
+            'enablePdf' => $this->enablePdf,
+            'enablePrint' => $this->enablePrint,
+            'enableExport' => $this->enableExport,
+            'enableImport' => $this->enableImport,
         ]);
     }
 

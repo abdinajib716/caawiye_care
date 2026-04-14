@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Backend;
 
+use App\Exports\OrderExport;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\ExcelExportService;
 use App\Services\OrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,7 +49,13 @@ class OrderController extends Controller
     {
         $this->authorize('view', $order);
 
-        $order->load(['customer', 'agent', 'items.service', 'paymentTransaction']);
+        $order->load([
+            'customer',
+            'agent',
+            'items.appointment.hospital',
+            'paymentTransaction',
+            'refunds',
+        ]);
 
         return view('backend.pages.orders.show', [
             'order' => $order,
@@ -60,6 +68,19 @@ class OrderController extends Controller
                 ],
             ],
         ]);
+    }
+
+    public function export(ExcelExportService $exportService)
+    {
+        $this->authorize('viewAny', Order::class);
+
+        $export = new OrderExport();
+
+        return $exportService->exportToCsv(
+            $export->data(),
+            $export->headers(),
+            $export->filename()
+        );
     }
 
     /**
@@ -155,4 +176,3 @@ class OrderController extends Controller
             ->with('success', __(':count orders updated successfully.', ['count' => $count]));
     }
 }
-

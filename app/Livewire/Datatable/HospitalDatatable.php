@@ -32,6 +32,12 @@ class HospitalDatatable extends Datatable
     public array $bulkActions = [
         'delete' => 'Delete Selected',
     ];
+    
+    // Export/Import Configuration
+    public bool $enablePdf = false;
+    public bool $enablePrint = false;
+    public bool $enableExport = true;
+    public bool $enableImport = true;
 
     public function getRoutes(): array
     {
@@ -41,6 +47,9 @@ class HospitalDatatable extends Datatable
             'show' => 'admin.hospitals.show',
             'edit' => 'admin.hospitals.edit',
             'destroy' => 'admin.hospitals.destroy',
+            'export' => 'admin.hospitals.export',
+            'import' => 'admin.hospitals.import',
+            'sampleTemplate' => 'admin.hospitals.sample-template',
         ];
     }
 

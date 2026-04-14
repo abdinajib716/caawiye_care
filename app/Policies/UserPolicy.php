@@ -109,18 +109,11 @@ class UserPolicy extends BasePolicy
     }
 
     /**
-     * Check if super admin can be modified based on demo mode.
+     * Check if super admin can be modified.
      */
     private function canModifySuperAdmin(User $model): bool
     {
-        $isSuperAdmin = $model->email === 'superadmin@example.com' ||
-            $model->username === 'Superadmin' ||
-            $model->hasRole('Superadmin');
-
-        if (config('app.demo_mode') && $isSuperAdmin) {
-            return false;
-        }
-
+        // Super admins can always be modified (unless blocked by permissions)
         return true;
     }
 }

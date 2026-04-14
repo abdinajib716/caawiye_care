@@ -95,55 +95,12 @@
         @endif
     </div>
 
-    <!-- Bulk Actions -->
-    @if(count($selectedItems) > 0)
-        <div class="mb-4 flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-            <div class="flex items-center">
-                <span class="text-sm font-medium text-blue-900 dark:text-blue-200">
-                    {{ __(':count orders selected', ['count' => count($selectedItems)]) }}
-                </span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button
-                    type="button"
-                    wire:click="executeBulkAction('mark_processing')"
-                    class="rounded-lg bg-yellow-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-yellow-700"
-                >
-                    {{ __('Mark Processing') }}
-                </button>
-                <button
-                    type="button"
-                    wire:click="executeBulkAction('mark_completed')"
-                    class="rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700"
-                >
-                    {{ __('Mark Completed') }}
-                </button>
-                <button
-                    type="button"
-                    wire:click="executeBulkAction('delete')"
-                    class="rounded-lg bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700"
-                >
-                    {{ __('Delete') }}
-                </button>
-            </div>
-        </div>
-    @endif
-
     <!-- Orders Table -->
     <div class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <!-- Select All -->
-                        <th class="w-12 px-4 py-3">
-                            <input
-                                type="checkbox"
-                                wire:model.live="selectAll"
-                                class="form-checkbox h-4 w-4 rounded border-gray-300 text-blue-600"
-                            />
-                        </th>
-
                         <!-- Order Number -->
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                             {{ __('Order #') }}
@@ -152,6 +109,11 @@
                         <!-- Customer -->
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                             {{ __('Customer') }}
+                        </th>
+
+                        <!-- Agent -->
+                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                            {{ __('Agent') }}
                         </th>
 
                         <!-- Items -->
@@ -188,16 +150,6 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
                     @forelse($items as $order)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                            <!-- Checkbox -->
-                            <td class="px-4 py-4">
-                                <input
-                                    type="checkbox"
-                                    wire:model.live="selectedItems"
-                                    value="{{ $order->id }}"
-                                    class="form-checkbox h-4 w-4 rounded border-gray-300 text-blue-600"
-                                />
-                            </td>
-
                             <!-- Order Number -->
                             <td class="px-4 py-4">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
@@ -210,6 +162,16 @@
                                 <div class="text-sm">
                                     <p class="font-medium text-gray-900 dark:text-white">{{ $order->customer->name }}</p>
                                     <p class="text-gray-500 dark:text-gray-400">{{ $order->customer->phone }}</p>
+                                </div>
+                            </td>
+
+                            <!-- Agent -->
+                            <td class="px-4 py-4">
+                                <div class="flex items-center">
+                                    <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                                        <span class="text-xs font-medium">{{ strtoupper(substr($order->agent->first_name ?? 'U', 0, 1) . substr($order->agent->last_name ?? '', 0, 1)) }}</span>
+                                    </div>
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-white">{{ $order->agent->name ?? 'N/A' }}</span>
                                 </div>
                             </td>
 
@@ -244,9 +206,32 @@
 
                             <!-- Actions -->
                             <td class="px-4 py-4 text-right text-sm">
-                                <a href="{{ route('admin.orders.show', $order) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                                    {{ __('View') }}
-                                </a>
+                                <div class="flex items-center justify-end space-x-2">
+                                    <!-- View -->
+                                    <a href="{{ route('admin.orders.show', $order) }}" 
+                                       class="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
+                                       title="{{ __('View Order') }}">
+                                        <iconify-icon icon="lucide:eye" class="h-4 w-4"></iconify-icon>
+                                    </a>
+                                    
+                                    @php
+                                        $activeRefund = $order->refunds->first(fn ($refund) => $refund->status !== 'rejected');
+                                    @endphp
+
+                                    @if($activeRefund)
+                                        <a href="{{ route('admin.refunds.show', $activeRefund) }}" 
+                                           class="inline-flex items-center justify-center rounded-lg p-2 text-orange-600 hover:bg-orange-50 hover:text-orange-800 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                                           title="{{ __('View Refund') }}">
+                                            <iconify-icon icon="lucide:receipt-text" class="h-4 w-4"></iconify-icon>
+                                        </a>
+                                    @elseif($order->canBeRefunded())
+                                        <a href="{{ route('admin.refunds.create', ['order_type' => get_class($order), 'order_id' => $order->id]) }}" 
+                                           class="inline-flex items-center justify-center rounded-lg p-2 text-orange-600 hover:bg-orange-50 hover:text-orange-800 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                                           title="{{ __('Initiate Refund') }}">
+                                            <iconify-icon icon="lucide:rotate-ccw" class="h-4 w-4"></iconify-icon>
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

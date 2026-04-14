@@ -51,7 +51,12 @@ class ImageService
             $targetPath = public_path($path);
 
             if (! file_exists($targetPath)) {
-                mkdir($targetPath, 0777, true);
+                try {
+                    File::makeDirectory($targetPath, 0755, true);
+                } catch (\Exception $e) {
+                    Log::error('Failed to create directory: ' . $targetPath . ' - ' . $e->getMessage());
+                    throw new \Exception('Unable to create upload directory. Please check permissions.');
+                }
             }
 
             $file->move($targetPath, $fileName);

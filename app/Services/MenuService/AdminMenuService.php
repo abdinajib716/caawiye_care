@@ -108,38 +108,7 @@ class AdminMenuService
             'permissions' => 'dashboard.view',
         ]);
 
-        // Services Management
-        $this->addMenuItem([
-            'label' => __('Services'),
-            'icon' => 'lucide:briefcase',
-            'id' => 'services-submenu',
-            'active' => Route::is('admin.services.*') || Route::is('admin.service-categories.*'),
-            'priority' => 10,
-            'permissions' => 'service.view',
-            'children' => [
-                [
-                    'label' => __('All Services'),
-                    'route' => route('admin.services.index'),
-                    'active' => Route::is('admin.services.index') || Route::is('admin.services.show'),
-                    'priority' => 10,
-                    'permissions' => 'service.view',
-                ],
-                [
-                    'label' => __('Add Service'),
-                    'route' => route('admin.services.create'),
-                    'active' => Route::is('admin.services.create'),
-                    'priority' => 20,
-                    'permissions' => 'service.create',
-                ],
-                [
-                    'label' => __('Categories'),
-                    'route' => route('admin.service-categories.index'),
-                    'active' => Route::is('admin.service-categories.*'),
-                    'priority' => 30,
-                    'permissions' => 'service.view',
-                ],
-            ],
-        ]);
+        // Services Management - REMOVED
 
         // Customers Management
         $this->addMenuItem([
@@ -245,16 +214,172 @@ class AdminMenuService
             ],
         ]);
 
-        // Order Zone - Quick Order Creation
+        // Medicine Collection Management
         $this->addMenuItem([
-            'label' => __('Order Zone'),
-            'icon' => 'lucide:zap',
-            'route' => route('admin.order-zone.index'),
-            'active' => Route::is('admin.order-zone.*'),
-            'id' => 'order-zone',
-            'priority' => 20,
-            'permissions' => 'order.create',
+            'label' => __('Medicines'),
+            'icon' => 'lucide:pill',
+            'id' => 'medicines-submenu',
+            'active' => Route::is('admin.medicine-orders.*') || Route::is('admin.medicines.*') || Route::is('admin.suppliers.*') || Route::is('admin.delivery-settings.*'),
+            'priority' => 19,
+            'permissions' => 'medicine_order.view',
+            'children' => [
+                [
+                    'label' => __('Book Medicine'),
+                    'route' => route('admin.medicine-orders.create'),
+                    'active' => Route::is('admin.medicine-orders.create'),
+                    'priority' => 10,
+                    'permissions' => 'medicine_order.create',
+                ],
+                [
+                    'label' => __('Medicine Items'),
+                    'route' => route('admin.medicines.index'),
+                    'active' => Route::is('admin.medicines.*'),
+                    'priority' => 20,
+                    'permissions' => 'medicine.view',
+                ],
+                [
+                    'label' => __('Suppliers'),
+                    'route' => route('admin.suppliers.index'),
+                    'active' => Route::is('admin.suppliers.*'),
+                    'priority' => 30,
+                    'permissions' => 'supplier.view',
+                ],
+                [
+                    'label' => __('Delivery Settings'),
+                    'route' => route('admin.delivery-settings.index'),
+                    'active' => Route::is('admin.delivery-settings.*'),
+                    'priority' => 40,
+                    'permissions' => 'delivery_location.view',
+                ],
+            ],
         ]);
+
+        // Lab Test Booking Management
+        $this->addMenuItem([
+            'label' => __('Lab Tests'),
+            'icon' => 'lucide:flask-conical',
+            'id' => 'lab-tests-submenu',
+            'active' => Route::is('admin.lab-test-bookings.*') || Route::is('admin.lab-tests.*'),
+            'priority' => 20,
+            'permissions' => 'lab_test_booking.view',
+            'children' => [
+                [
+                    'label' => __('Book Lab Test'),
+                    'route' => route('admin.lab-test-bookings.create'),
+                    'active' => Route::is('admin.lab-test-bookings.create'),
+                    'priority' => 10,
+                    'permissions' => 'lab_test_booking.create',
+                ],
+                [
+                    'label' => __('Lab Test Bookings'),
+                    'route' => route('admin.lab-test-bookings.index'),
+                    'active' => Route::is('admin.lab-test-bookings.index') || Route::is('admin.lab-test-bookings.show'),
+                    'priority' => 20,
+                    'permissions' => 'lab_test_booking.view',
+                ],
+                [
+                    'label' => __('Lab Tests'),
+                    'route' => route('admin.lab-tests.index'),
+                    'active' => Route::is('admin.lab-tests.*'),
+                    'priority' => 30,
+                    'permissions' => 'lab_test.view',
+                ],
+            ],
+        ]);
+
+        // Scan & Imaging Management
+        $this->addMenuItem([
+            'label' => __('Scan & Imaging'),
+            'icon' => 'lucide:scan',
+            'id' => 'scan-imaging-submenu',
+            'active' => Route::is('admin.scan-imaging-bookings.*') || Route::is('admin.scan-imaging-services.*'),
+            'priority' => 21,
+            'permissions' => 'scan_imaging_booking.view',
+            'children' => [
+                [
+                    'label' => __('Book Scan & Imaging'),
+                    'route' => route('admin.scan-imaging-bookings.create'),
+                    'active' => Route::is('admin.scan-imaging-bookings.create'),
+                    'priority' => 10,
+                    'permissions' => 'scan_imaging_booking.create',
+                ],
+                [
+                    'label' => __('Scan & Imaging Bookings'),
+                    'route' => route('admin.scan-imaging-bookings.index'),
+                    'active' => Route::is('admin.scan-imaging-bookings.index') || Route::is('admin.scan-imaging-bookings.show'),
+                    'priority' => 20,
+                    'permissions' => 'scan_imaging_booking.view',
+                ],
+                [
+                    'label' => __('Services'),
+                    'route' => route('admin.scan-imaging-services.index'),
+                    'active' => Route::is('admin.scan-imaging-services.*'),
+                    'priority' => 30,
+                    'permissions' => 'scan_imaging_service.view',
+                ],
+            ],
+        ]);
+
+        // Report Collections Management
+        $this->addMenuItem([
+            'label' => __('Collections'),
+            'icon' => 'lucide:clipboard-list',
+            'id' => 'collections-submenu',
+            'active' => Route::is('admin.collections.*'),
+            'priority' => 22,
+            'permissions' => 'report.view',
+            'children' => [
+                [
+                    'label' => __('New Request'),
+                    'route' => route('admin.collections.create'),
+                    'active' => Route::is('admin.collections.create'),
+                    'priority' => 10,
+                    'permissions' => 'report.view',
+                ],
+                [
+                    'label' => __('All Requests'),
+                    'route' => route('admin.collections.index'),
+                    'active' => Route::is('admin.collections.index') || Route::is('admin.collections.show'),
+                    'priority' => 20,
+                    'permissions' => 'report.view',
+                ],
+                [
+                    'label' => __('Settings'),
+                    'route' => route('admin.collections.settings'),
+                    'active' => Route::is('admin.collections.settings'),
+                    'priority' => 30,
+                    'permissions' => 'report.view',
+                ],
+            ],
+        ]);
+
+        // Providers Management
+        $this->addMenuItem([
+            'label' => __('Providers'),
+            'icon' => 'lucide:building',
+            'id' => 'providers-submenu',
+            'active' => Route::is('admin.providers.*'),
+            'priority' => 23,
+            'permissions' => 'provider.view',
+            'children' => [
+                [
+                    'label' => __('All Providers'),
+                    'route' => route('admin.providers.index'),
+                    'active' => Route::is('admin.providers.index') || Route::is('admin.providers.show'),
+                    'priority' => 10,
+                    'permissions' => 'provider.view',
+                ],
+                [
+                    'label' => __('Add Provider'),
+                    'route' => route('admin.providers.create'),
+                    'active' => Route::is('admin.providers.create'),
+                    'priority' => 20,
+                    'permissions' => 'provider.create',
+                ],
+            ],
+        ]);
+
+        // Order Zone - REMOVED
 
         // Orders Management
         $this->addMenuItem([
@@ -284,6 +409,105 @@ class AdminMenuService
             'id' => 'transactions',
             'priority' => 30,
             'permissions' => 'transaction.view',
+        ]);
+
+        // Expenses Management
+        $this->addMenuItem([
+            'label' => __('Expenses'),
+            'icon' => 'lucide:receipt',
+            'id' => 'expenses-submenu',
+            'active' => Route::is('admin.expenses.*') || Route::is('admin.expense-categories.*'),
+            'priority' => 32,
+            'permissions' => 'expense.view',
+            'children' => [
+                [
+                    'label' => __('All Expenses'),
+                    'route' => route('admin.expenses.index'),
+                    'active' => Route::is('admin.expenses.index') || Route::is('admin.expenses.show'),
+                    'priority' => 10,
+                    'permissions' => 'expense.view',
+                ],
+                [
+                    'label' => __('Add Expense'),
+                    'route' => route('admin.expenses.create'),
+                    'active' => Route::is('admin.expenses.create'),
+                    'priority' => 20,
+                    'permissions' => 'expense.create',
+                ],
+                [
+                    'label' => __('Categories'),
+                    'route' => route('admin.expense-categories.index'),
+                    'active' => Route::is('admin.expense-categories.*'),
+                    'priority' => 30,
+                    'permissions' => 'expense_category.view',
+                ],
+            ],
+        ]);
+
+        // Refunds Management
+        $this->addMenuItem([
+            'label' => __('Refunds'),
+            'icon' => 'lucide:undo-2',
+            'id' => 'refunds-submenu',
+            'active' => Route::is('admin.refunds.*'),
+            'priority' => 33,
+            'permissions' => 'refund.view',
+            'children' => [
+                [
+                    'label' => __('All Refunds'),
+                    'route' => route('admin.refunds.index'),
+                    'active' => Route::is('admin.refunds.index') || Route::is('admin.refunds.show'),
+                    'priority' => 10,
+                    'permissions' => 'refund.view',
+                ],
+            ],
+        ]);
+
+        // Financial Reports
+        $this->addMenuItem([
+            'label' => __('Reports'),
+            'icon' => 'lucide:bar-chart-3',
+            'id' => 'reports-submenu',
+            'active' => Route::is('admin.reports.*'),
+            'priority' => 35,
+            'permissions' => 'report.view',
+            'children' => [
+                [
+                    'label' => __('Overview'),
+                    'route' => route('admin.reports.index'),
+                    'active' => Route::is('admin.reports.index'),
+                    'priority' => 10,
+                    'permissions' => 'report.view',
+                ],
+                [
+                    'label' => __('Revenue Report'),
+                    'route' => route('admin.reports.revenue'),
+                    'active' => Route::is('admin.reports.revenue'),
+                    'priority' => 20,
+                    'permissions' => 'report.view',
+                ],
+                [
+                    'label' => __('Expense Report'),
+                    'route' => route('admin.reports.expenses'),
+                    'active' => Route::is('admin.reports.expenses'),
+                    'priority' => 30,
+                    'permissions' => 'report.view',
+                ],
+                [
+                    'label' => __('Provider Payouts'),
+                    'route' => route('admin.reports.provider-payouts'),
+                    'active' => Route::is('admin.reports.provider-payouts'),
+                    'priority' => 40,
+                    'permissions' => 'report.view',
+                ],
+                [
+                    'label' => __('Profit & Loss'),
+                    'route' => route('admin.reports.profit-loss'),
+                    'active' => Route::is('admin.reports.profit-loss'),
+                    'priority' => 50,
+                    'permissions' => 'report.view',
+                ],
+            ],
         ]);
 
         // Removed: Posts, Media Library, and Modules functionality

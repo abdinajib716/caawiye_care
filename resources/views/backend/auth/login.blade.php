@@ -30,7 +30,7 @@
               autocomplete="username"
               placeholder="{{ __('Enter your email') }}"
               class="form-control"
-              value="{{ old('email') ?? config('app.demo_mode', false) ? 'superadmin@example.com' : '' }}"
+              value="{{ old('email') }}"
               required
             />
           </div>
@@ -39,7 +39,6 @@
             name="password" 
             label="{{ __('Password') }}"
             placeholder="{{ __('Enter your password') }}" 
-            value="{{ (config('app.demo_mode', false) ? '12345678' : '') }}" 
             required
           />
 
@@ -64,62 +63,8 @@
               <iconify-icon :icon="loading ? 'lucide:loader-circle' : 'lucide:log-in'" :class="{ 'animate-spin': loading, 'ml-2': !loading }" />
             </button>
           </div>
-          @if (config('app.demo_mode', false))
-          <div x-data="{ showDemoCredentials: false }" class="mt-4 border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
-            <button
-              type="button"
-              @click="showDemoCredentials = !showDemoCredentials"
-              class="flex justify-between items-center w-full px-4 py-3 text-sm font-medium text-left text-brand-600 dark:text-brand-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <span>
-                <iconify-icon icon="lucide:info" class="mr-2"></iconify-icon>
-                {{ __('Demo Credentials') }}
-              </span>
-              <iconify-icon :icon="showDemoCredentials ? 'lucide:chevron-up' : 'lucide:chevron-down'"></iconify-icon>
-            </button>
-
-            <div x-show="showDemoCredentials" x-transition class="px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-              <div class="mb-3">
-                <p class="text-sm text-gray-600 dark:text-gray-300">{{ __('Use these credentials to explore the demo:') }}</p>
-              </div>
-              <div class="grid grid-cols-1 gap-2 mb-3 text-gray-500 dark:text-gray-300">
-                <div class="flex items-center">
-                  <span class="w-20 text-xs font-medium">{{ __('Email:') }}</span>
-                  <code class="px-2 py-1 text-xs font-mono bg-gray-100 dark:bg-gray-800 rounded">superadmin@example.com</code>
-                </div>
-                <div class="flex items-center">
-                  <span class="w-20 text-xs font-medium">{{ __('Password:') }}</span>
-                  <code class="px-2 py-1 text-xs font-mono bg-gray-100 dark:bg-gray-800 rounded">12345678</code>
-                </div>
-              </div>
-              <button
-                type="button"
-                id="fill-demo-credentials"
-                class="!text-xs btn-default"
-                :disabled="loading"
-                @click="loading = true"
-              >
-                <span x-text="loading ? '' : '{{ __('Login Now') }}'">{{ __('Login Now') }}</span>
-                <iconify-icon :icon="loading ? 'lucide:loader-circle' : 'lucide:log-in'" :class="{ 'animate-spin': loading, 'ml-2': !loading }" />
-              </button>
-            </div>
-          </div>
-          @endif
         </div>
       </form>
     </div>
 </div>
 @endsection
-
-@if (config('app.demo_mode', false))
-    @push('scripts')
-        <script>
-            document.getElementById('fill-demo-credentials').addEventListener('click', function() {
-              console.log('clicked');
-                document.getElementById('email').value = 'superadmin@example.com';
-                document.querySelector('input[name="password"]').value = '12345678';
-                document.querySelector('form').submit();
-            });
-        </script>
-    @endpush
-@endif

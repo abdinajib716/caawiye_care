@@ -11,14 +11,25 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Drop the old name field since first_name and last_name already exist
-            $table->dropColumn('name');
+            // Check and drop the old name field if it exists
+            if (Schema::hasColumn('users', 'name')) {
+                $table->dropColumn('name');
+            }
 
-            $table->string('first_name')->after('id');
-            $table->string('last_name')->after('first_name');
+            // Add first_name and last_name if they don't exist
+            if (!Schema::hasColumn('users', 'first_name')) {
+                $table->string('first_name')->after('id');
+            }
+            if (!Schema::hasColumn('users', 'last_name')) {
+                $table->string('last_name')->after('first_name');
+            }
 
-            $table->unsignedBigInteger('avatar_id')->nullable()->after('username');
-            $table->foreign('avatar_id')->references('id')->on('media')->onDelete('set null');
+            // Add avatar_id if it doesn't exist
+            if (!Schema::hasColumn('users', 'avatar_id')) {
+                $table->unsignedBigInteger('avatar_id')->nullable()->after('username');
+                // Note: media table might not exist yet, so skip foreign key for now
+                // $table->foreign('avatar_id')->references('id')->on('media')->onDelete('set null');
+            }
         });
     }
 

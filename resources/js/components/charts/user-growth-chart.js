@@ -1,19 +1,15 @@
 import ApexCharts from "apexcharts";
 
-const userGrowthData_Data = typeof userGrowthData !== 'undefined' ? userGrowthData : [];
-const userGrowthLabels_Labels = typeof userGrowthLabels !== 'undefined' ? userGrowthLabels : [];
+const dashboardBarChartData_Data = typeof dashboardBarChartData !== 'undefined' ? dashboardBarChartData : [];
+const dashboardBarChartLabels_Labels = typeof dashboardBarChartLabels !== 'undefined' ? dashboardBarChartLabels : [];
+const dashboardBarChartSeries_Name = typeof dashboardBarChartSeriesName !== 'undefined' ? dashboardBarChartSeriesName : 'Series';
 
-// ===== User Growth Chart.
 const userGrowthChart = () => {
-  console.log('User Growth Chart initializing...', {
-    data: userGrowthData_Data,
-    labels: userGrowthLabels_Labels
-  });
   const chartOneOptions = {
     series: [
       {
-        name: "User Registered",
-        data: userGrowthData_Data,
+        name: dashboardBarChartSeries_Name,
+        data: dashboardBarChartData_Data,
       },
     ],
     colors: ["#465fff"],
@@ -42,7 +38,7 @@ const userGrowthChart = () => {
       colors: ["transparent"],
     },
     xaxis: {
-      categories: userGrowthLabels_Labels, // Dynamically set labels
+      categories: dashboardBarChartLabels_Labels,
       axisBorder: {
         show: false,
       },
@@ -80,24 +76,20 @@ const userGrowthChart = () => {
       },
       y: {
         formatter: function (val) {
-          return val;
+          return `$${Number(val).toFixed(2)}`;
         },
       },
     },
   };
 
   const chartSelector = document.querySelectorAll("#user-growth-chart");
-  console.log('Chart selector found:', chartSelector.length, 'elements');
 
   if (chartSelector.length) {
-    console.log('Rendering user growth chart...');
     const chartFour = new ApexCharts(
       document.querySelector("#user-growth-chart"),
       chartOneOptions,
     );
     chartFour.render();
-  } else {
-    console.log('No #user-growth-chart element found');
   }
 };
 

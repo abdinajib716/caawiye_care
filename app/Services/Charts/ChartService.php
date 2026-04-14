@@ -15,6 +15,8 @@ abstract class ChartService
                 return [Carbon::now()->subDays(7), Carbon::now()];
             case 'last_30_days':
                 return [Carbon::now()->subDays(30), Carbon::now()];
+            case 'last_6_months':
+                return [Carbon::now()->subMonths(6)->startOfMonth(), Carbon::now()];
             case 'this_month':
                 return [Carbon::now()->startOfMonth(), Carbon::now()];
             case 'last_year':

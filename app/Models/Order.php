@@ -30,6 +30,9 @@ class Order extends Model
         'tax',
         'discount',
         'total',
+        'provider_cost',
+        'provider_id',
+        'provider_type',
         'payment_method',
         'payment_provider',
         'payment_phone',
@@ -38,6 +41,9 @@ class Order extends Model
         'status',
         'notes',
         'completed_at',
+        'revenue_recorded_at',
+        'refunded_at',
+        'refund_reason',
     ];
 
     /**
@@ -50,7 +56,10 @@ class Order extends Model
         'tax' => 'decimal:2',
         'discount' => 'decimal:2',
         'total' => 'decimal:2',
+        'provider_cost' => 'decimal:2',
         'completed_at' => 'datetime',
+        'revenue_recorded_at' => 'datetime',
+        'refunded_at' => 'datetime',
     ];
 
     /**
@@ -97,6 +106,38 @@ class Order extends Model
     public function paymentTransaction(): BelongsTo
     {
         return $this->belongsTo(PaymentTransaction::class, 'payment_transaction_id');
+    }
+
+    /**
+     * Get the provider for the order.
+     */
+    public function provider()
+    {
+        return $this->morphTo('provider', 'provider_type', 'provider_id');
+    }
+
+    /**
+     * Get the provider payments for this order.
+     */
+    public function providerPayments()
+    {
+        return $this->morphMany(ProviderPayment::class, 'order', 'order_type', 'order_id');
+    }
+
+    /**
+     * Get the refunds for this order.
+     */
+    public function refunds()
+    {
+        return $this->morphMany(Refund::class, 'order', 'order_type', 'order_id');
+    }
+
+    /**
+     * Get the revenue ledger entries for this order.
+     */
+    public function revenueEntries()
+    {
+        return $this->morphMany(RevenueLedger::class, 'order', 'order_type', 'order_id');
     }
 
     /**
@@ -302,6 +343,90 @@ class Order extends Model
             'refunded' => 'gray',
             default => 'gray',
         };
+    }
+
+    /**
+     * Scope a query to only include refunded orders.
+     */
+    public function scopeRefunded($query)
+    {
+        return $query->whereNotNull('refunded_at');
+    }
+
+    /**
+     * Scope a query to exclude refunded orders.
+     */
+    public function scopeNotRefunded($query)
+    {
+        return $query->whereNull('refunded_at');
+    }
+
+    /**
+     * Check if the order is refunded.
+     */
+    public function isRefunded(): bool
+    {
+        return $this->refunded_at !== null || $this->payment_status === 'refunded';
+    }
+
+    /**
+     * Check if the order can be refunded.
+     */
+    public function canBeRefunded(): bool
+    {
+        return $this->isCompleted() && !$this->isRefunded();
+    }
+
+    /**
+     * Check if revenue has been recorded.
+     */
+    public function hasRevenueRecorded(): bool
+    {
+        return $this->revenue_recorded_at !== null;
+    }
+
+    /**
+     * Mark the order as refunded.
+     */
+    public function markAsRefunded(string $reason = null): void
+    {
+        $this->update([
+            'refunded_at' => now(),
+            'refund_reason' => $reason,
+            'payment_status' => 'refunded',
+        ]);
+    }
+
+    /**
+     * Get formatted provider cost with currency.
+     */
+    public function getFormattedProviderCostAttribute(): string
+    {
+        return '$' . number_format((float) $this->provider_cost, 2);
+    }
+
+    /**
+     * Get the profit (total - provider_cost).
+     */
+    public function getProfitAttribute(): float
+    {
+        return (float) $this->total - (float) $this->provider_cost;
+    }
+
+    /**
+     * Get formatted profit with currency.
+     */
+    public function getFormattedProfitAttribute(): string
+    {
+        return '$' . number_format($this->profit, 2);
+    }
+
+    /**
+     * Get the order type class name for polymorphic relations.
+     */
+    public static function getOrderType(): string
+    {
+        return Order::class;
     }
 }
 

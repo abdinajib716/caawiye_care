@@ -16,34 +16,17 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'first_name' => 'Super',
-            'last_name' => 'Admin',
-            'email' => 'superadmin@example.com',
+            'first_name' => 'Karshe',
+            'last_name' => 'Yare',
+            'email' => 'karsheyare152@gmail.com',
             'username' => 'superadmin',
             'password' => Hash::make('12345678'),
             'email_verified_at' => now(),
         ]);
 
-        User::create([
-            'first_name' => 'Admin',
-            'last_name' => '',
-            'email' => 'admin@example.com',
-            'username' => 'admin',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-        ]);
-
-        User::create([
-            'first_name' => 'Sub',
-            'last_name' => 'Scriber',
-            'email' => 'subscriber@example.com',
-            'username' => 'subscriber',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-        ]);
-
-        // Run factory to create additional users with unique details.
-        User::factory()->count(500)->create();
-        $this->command->info('Users table seeded with 502 users!');
+        // Removed demo users to keep database clean
+        // Only superadmin user is created above
+        
+        $this->command->info('Users table seeded with 1 superadmin user!');
     }
 }

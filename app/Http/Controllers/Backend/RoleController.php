@@ -102,11 +102,6 @@ class RoleController extends Controller
             return back();
         }
 
-        // Check if this is the Superadmin role in demo mode - return 403 directly
-        if (config('app.demo_mode') && $role->name === 'Superadmin') {
-            abort(403, 'Cannot modify Superadmin role in demo mode.');
-        }
-
         $this->authorize('update', $role);
 
         $data = $this->addHooks(
@@ -136,11 +131,6 @@ class RoleController extends Controller
             session()->flash('error', __('Role not found.'));
 
             return back();
-        }
-
-        // Check if this is the Superadmin role in demo mode - return 403 directly
-        if (config('app.demo_mode') && $role->name === Role::SUPERADMIN) {
-            abort(403, 'Cannot delete Superadmin role in demo mode.');
         }
 
         $this->authorize('delete', $role);

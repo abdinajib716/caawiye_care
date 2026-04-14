@@ -6,7 +6,19 @@
     @if ($pageTitle ?? false)
         {{ $pageTitle }}
     @else
-        {{ $breadcrumbs['title'] ?? '' }} | {{ config('app.name') }}
+        @php
+            // Get the last breadcrumb item's label as the page title
+            $pageTitle = '';
+            if (is_array($breadcrumbs) && !empty($breadcrumbs)) {
+                if (isset($breadcrumbs['title'])) {
+                    $pageTitle = $breadcrumbs['title'];
+                } elseif (isset($breadcrumbs[0])) {
+                    $lastBreadcrumb = end($breadcrumbs);
+                    $pageTitle = $lastBreadcrumb['label'] ?? '';
+                }
+            }
+        @endphp
+        {{ $pageTitle }} | {{ config('app.name') }}
     @endif
 @endsection
 

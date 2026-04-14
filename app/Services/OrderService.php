@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Customer;
-use App\Models\Service;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +18,6 @@ class OrderService
      * Constructor with dependency injection.
      */
     public function __construct(
-        private ServiceFieldDataService $fieldDataService,
         private AppointmentService $appointmentService
     ) {
     }
@@ -29,7 +27,7 @@ class OrderService
      */
     public function getPaginatedOrders(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $query = Order::with(['customer', 'agent', 'items.service', 'paymentTransaction']);
+        $query = Order::with(['customer', 'agent', 'items', 'paymentTransaction']);
 
         // Apply search filter
         if (!empty($filters['search'])) {
@@ -133,7 +131,7 @@ class OrderService
                 ]);
             }
 
-            return $order->load(['customer', 'agent', 'items.service']);
+            return $order->load(['customer', 'agent', 'items']);
         });
     }
 
@@ -181,7 +179,7 @@ class OrderService
 
             // Create order items
             foreach ($orderData['items'] as $item) {
-                $orderItem = OrderItem::create([
+                OrderItem::create([
                     'order_id' => $order->id,
                     'service_id' => $item['service_id'],
                     'service_name' => $item['service_name'],
@@ -189,46 +187,10 @@ class OrderService
                     'unit_price' => $item['unit_price'],
                     'total_price' => $item['unit_price'] * $item['quantity'],
                 ]);
-
-                // Handle service field data if present
-                if (!empty($item['field_data'])) {
-                    $service = Service::find($item['service_id']);
-                    if ($service && $service->hasCustomFields()) {
-                        $this->fieldDataService->saveFieldData($orderItem, $service, $item['field_data']);
-
-                        // Create appointment if service is appointment type
-                        if ($service->isAppointment()) {
-                            $this->createAppointmentFromFieldData(
-                                $order,
-                                $orderItem,
-                                $item['field_data']
-                            );
-                        }
-                    }
-                }
             }
 
-            return $order->load(['customer', 'agent', 'items.service', 'paymentTransaction']);
+            return $order->load(['customer', 'agent', 'items', 'paymentTransaction']);
         });
-    }
-
-    /**
-     * Create appointment from field data.
-     */
-    private function createAppointmentFromFieldData(Order $order, OrderItem $orderItem, array $fieldData): void
-    {
-        $appointmentData = [
-            'order_id' => $order->id,
-            'order_item_id' => $orderItem->id,
-            'customer_id' => $order->customer_id,
-            'hospital_id' => $fieldData['hospital_id'],
-            'appointment_type' => $fieldData['appointment_type'] ?? 'self',
-            'patient_name' => $fieldData['patient_name'] ?? null,
-            'appointment_time' => $fieldData['appointment_time'],
-            'status' => 'scheduled',
-        ];
-
-        $this->appointmentService->createAppointment($appointmentData);
     }
 
     /**
@@ -249,7 +211,7 @@ class OrderService
                 $order->update(['completed_at' => now()]);
             }
 
-            return $order->fresh(['customer', 'agent', 'items.service']);
+            return $order->fresh(['customer', 'agent', 'items']);
         });
     }
 
@@ -297,7 +259,7 @@ class OrderService
     public function getOrdersByCustomer(Customer $customer): Collection
     {
         return $customer->orders()
-            ->with(['agent', 'items.service'])
+            ->with(['agent', 'items'])
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -321,19 +283,7 @@ class OrderService
      */
     public function generateOrderNumber(): string
     {
-        $prefix = 'ORD';
-        $date = now()->format('Ymd');
-        $random = strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 6));
-        
-        $orderNumber = "{$prefix}-{$date}-{$random}";
-
-        // Ensure uniqueness
-        while (Order::where('order_number', $orderNumber)->exists()) {
-            $random = strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 6));
-            $orderNumber = "{$prefix}-{$date}-{$random}";
-        }
-
-        return $orderNumber;
+        return app(\App\Services\SequentialIdService::class)->generateOrderNumber();
     }
 
     /**
@@ -373,7 +323,7 @@ class OrderService
     public function getOrderByNumber(string $orderNumber): ?Order
     {
         return Order::where('order_number', $orderNumber)
-            ->with(['customer', 'agent', 'items.service', 'paymentTransaction'])
+            ->with(['customer', 'agent', 'items', 'paymentTransaction'])
             ->first();
     }
 }
