@@ -149,8 +149,10 @@ class AdminMenuItem
 
     public function userHasPermission(): bool
     {
+        $hasVisibleChildren = $this->hasVisibleChildren();
+
         if (empty($this->permissions)) {
-            return true;
+            return empty($this->children) || $hasVisibleChildren;
         }
 
         $user = Auth::user();
@@ -160,7 +162,7 @@ class AdminMenuItem
             }
         }
 
-        return false;
+        return $hasVisibleChildren;
     }
 
     public function setHtml(string $htmlData): self
@@ -202,5 +204,16 @@ class AdminMenuItem
                 return $child->toArray();
             }, $this->children),
         ];
+    }
+
+    protected function hasVisibleChildren(): bool
+    {
+        foreach ($this->children as $child) {
+            if ($child->userHasPermission()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

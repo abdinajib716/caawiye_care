@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Add provider_payment_status to lab_test_bookings
-        Schema::table('lab_test_bookings', function (Blueprint $table) {
-            $table->string('provider_payment_status')->default('unpaid')->after('status');
-        });
+        if (Schema::hasTable('lab_test_bookings') && ! Schema::hasColumn('lab_test_bookings', 'provider_payment_status')) {
+            Schema::table('lab_test_bookings', function (Blueprint $table) {
+                $table->string('provider_payment_status')->default('unpaid')->after('status');
+            });
+        }
 
-        // Add provider_payment_status to scan_imaging_bookings
-        Schema::table('scan_imaging_bookings', function (Blueprint $table) {
-            $table->string('provider_payment_status')->default('unpaid')->after('status');
-        });
+        if (Schema::hasTable('scan_imaging_bookings') && ! Schema::hasColumn('scan_imaging_bookings', 'provider_payment_status')) {
+            Schema::table('scan_imaging_bookings', function (Blueprint $table) {
+                $table->string('provider_payment_status')->default('unpaid')->after('status');
+            });
+        }
     }
 
     /**
@@ -27,12 +29,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('lab_test_bookings', function (Blueprint $table) {
-            $table->dropColumn('provider_payment_status');
-        });
+        if (Schema::hasTable('lab_test_bookings') && Schema::hasColumn('lab_test_bookings', 'provider_payment_status')) {
+            Schema::table('lab_test_bookings', function (Blueprint $table) {
+                $table->dropColumn('provider_payment_status');
+            });
+        }
 
-        Schema::table('scan_imaging_bookings', function (Blueprint $table) {
-            $table->dropColumn('provider_payment_status');
-        });
+        if (Schema::hasTable('scan_imaging_bookings') && Schema::hasColumn('scan_imaging_bookings', 'provider_payment_status')) {
+            Schema::table('scan_imaging_bookings', function (Blueprint $table) {
+                $table->dropColumn('provider_payment_status');
+            });
+        }
     }
 };

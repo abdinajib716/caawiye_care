@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'])->default('pending');
+            $table->string('provider_payment_status')->default('unpaid');
             $table->text('notes')->nullable();
             $table->text('cancellation_reason')->nullable();
             $table->timestamp('confirmed_at')->nullable();

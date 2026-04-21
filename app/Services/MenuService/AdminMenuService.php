@@ -327,28 +327,28 @@ class AdminMenuService
             'id' => 'collections-submenu',
             'active' => Route::is('admin.collections.*'),
             'priority' => 22,
-            'permissions' => 'report.view',
+            'permissions' => ['report.view', 'collection.view'],
             'children' => [
                 [
                     'label' => __('New Request'),
                     'route' => route('admin.collections.create'),
                     'active' => Route::is('admin.collections.create'),
                     'priority' => 10,
-                    'permissions' => 'report.view',
+                    'permissions' => ['report.view', 'collection.view'],
                 ],
                 [
                     'label' => __('All Requests'),
                     'route' => route('admin.collections.index'),
                     'active' => Route::is('admin.collections.index') || Route::is('admin.collections.show'),
                     'priority' => 20,
-                    'permissions' => 'report.view',
+                    'permissions' => ['report.view', 'collection.view'],
                 ],
                 [
                     'label' => __('Settings'),
                     'route' => route('admin.collections.settings'),
                     'active' => Route::is('admin.collections.settings'),
                     'priority' => 30,
-                    'permissions' => 'report.view',
+                    'permissions' => ['report.view', 'collection.view'],
                 ],
             ],
         ]);
@@ -540,7 +540,7 @@ class AdminMenuService
                 'id' => 'access-control-submenu',
                 'active' => Route::is('admin.roles.*') || Route::is('admin.permissions.*') || Route::is('admin.users.*'),
                 'priority' => 30,
-                'permissions' => ['role.create', 'role.view', 'role.edit', 'role.delete', 'user.create', 'user.view', 'user.edit', 'user.delete'],
+                'permissions' => ['role.create', 'role.view', 'role.edit', 'role.delete', 'user.create', 'user.view', 'user.edit', 'user.delete', 'permission.view'],
                 'children' => [
                     [
                         'label' => __('Users'),
@@ -561,7 +561,7 @@ class AdminMenuService
                         'route' => route('admin.permissions.index'),
                         'active' => Route::is('admin.permissions.index') || Route::is('admin.permissions.show'),
                         'priority' => 30,
-                        'permissions' => 'role.view',
+                        'permissions' => 'permission.view',
                     ],
                 ],
             ],

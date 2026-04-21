@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Permission;
-use Spatie\Permission\Models\Permission as SpatiePermission;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -32,6 +31,8 @@ class PermissionService
                     'user.edit',
                     'user.delete',
                     'user.approve',
+                    'user.restore',
+                    'user.force_delete',
                     'user.login_as',
                 ],
             ],
@@ -43,6 +44,15 @@ class PermissionService
                     'role.edit',
                     'role.delete',
                     'role.approve',
+                ],
+            ],
+            [
+                'group_name' => 'permission',
+                'permissions' => [
+                    'permission.create',
+                    'permission.view',
+                    'permission.edit',
+                    'permission.delete',
                 ],
             ],
 
@@ -60,6 +70,9 @@ class PermissionService
                 'permissions' => [
                     'pulse.view',
                     'actionlog.view',
+                    'actionlog.create',
+                    'actionlog.edit',
+                    'actionlog.delete',
                 ],
             ],
             [
@@ -100,6 +113,129 @@ class PermissionService
                 ],
             ],
             [
+                'group_name' => 'hospital',
+                'permissions' => [
+                    'hospital.create',
+                    'hospital.view',
+                    'hospital.edit',
+                    'hospital.delete',
+                    'hospital.restore',
+                    'hospital.force_delete',
+                ],
+            ],
+            [
+                'group_name' => 'doctor',
+                'permissions' => [
+                    'doctor.create',
+                    'doctor.view',
+                    'doctor.edit',
+                    'doctor.delete',
+                    'doctor.restore',
+                    'doctor.force_delete',
+                ],
+            ],
+            [
+                'group_name' => 'appointment',
+                'permissions' => [
+                    'appointment.create',
+                    'appointment.view',
+                    'appointment.edit',
+                    'appointment.delete',
+                ],
+            ],
+            [
+                'group_name' => 'medicine_order',
+                'permissions' => [
+                    'medicine_order.create',
+                    'medicine_order.view',
+                    'medicine_order.edit',
+                    'medicine_order.delete',
+                ],
+            ],
+            [
+                'group_name' => 'medicine',
+                'permissions' => [
+                    'medicine.create',
+                    'medicine.view',
+                    'medicine.edit',
+                    'medicine.delete',
+                ],
+            ],
+            [
+                'group_name' => 'supplier',
+                'permissions' => [
+                    'supplier.create',
+                    'supplier.view',
+                    'supplier.edit',
+                    'supplier.delete',
+                    'supplier.restore',
+                    'supplier.force_delete',
+                ],
+            ],
+            [
+                'group_name' => 'delivery_location',
+                'permissions' => [
+                    'delivery_location.create',
+                    'delivery_location.view',
+                    'delivery_location.edit',
+                    'delivery_location.delete',
+                ],
+            ],
+            [
+                'group_name' => 'delivery_price',
+                'permissions' => [
+                    'delivery_price.create',
+                    'delivery_price.view',
+                    'delivery_price.edit',
+                    'delivery_price.delete',
+                ],
+            ],
+            [
+                'group_name' => 'lab_test',
+                'permissions' => [
+                    'lab_test.create',
+                    'lab_test.view',
+                    'lab_test.edit',
+                    'lab_test.delete',
+                ],
+            ],
+            [
+                'group_name' => 'lab_test_booking',
+                'permissions' => [
+                    'lab_test_booking.create',
+                    'lab_test_booking.view',
+                    'lab_test_booking.edit',
+                    'lab_test_booking.delete',
+                ],
+            ],
+            [
+                'group_name' => 'scan_imaging_service',
+                'permissions' => [
+                    'scan_imaging_service.create',
+                    'scan_imaging_service.view',
+                    'scan_imaging_service.edit',
+                    'scan_imaging_service.delete',
+                ],
+            ],
+            [
+                'group_name' => 'scan_imaging_booking',
+                'permissions' => [
+                    'scan_imaging_booking.create',
+                    'scan_imaging_booking.view',
+                    'scan_imaging_booking.edit',
+                    'scan_imaging_booking.delete',
+                ],
+            ],
+            [
+                'group_name' => 'provider',
+                'permissions' => [
+                    'provider.create',
+                    'provider.view',
+                    'provider.edit',
+                    'provider.delete',
+                ],
+            ],
+            [
                 'group_name' => 'order',
                 'permissions' => [
                     'order.create',
@@ -117,6 +253,56 @@ class PermissionService
                     'transaction.create',
                     'transaction.edit',
                     'transaction.delete',
+                ],
+            ],
+            [
+                'group_name' => 'expense',
+                'permissions' => [
+                    'expense.view',
+                    'expense.create',
+                    'expense.edit',
+                    'expense.delete',
+                    'expense.approve',
+                ],
+            ],
+            [
+                'group_name' => 'expense_category',
+                'permissions' => [
+                    'expense_category.view',
+                    'expense_category.create',
+                    'expense_category.edit',
+                    'expense_category.delete',
+                ],
+            ],
+            [
+                'group_name' => 'refund',
+                'permissions' => [
+                    'refund.view',
+                    'refund.create',
+                    'refund.approve',
+                    'refund.process',
+                ],
+            ],
+            [
+                'group_name' => 'provider_payment',
+                'permissions' => [
+                    'provider_payment.view',
+                    'provider_payment.create',
+                    'provider_payment.approve',
+                    'provider_payment.pay',
+                ],
+            ],
+            [
+                'group_name' => 'report',
+                'permissions' => [
+                    'report.view',
+                    'report.export',
+                ],
+            ],
+            [
+                'group_name' => 'collection',
+                'permissions' => [
+                    'collection.view',
                 ],
             ],
         ];

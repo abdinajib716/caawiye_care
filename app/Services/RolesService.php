@@ -71,7 +71,12 @@ class RolesService
         $role = Role::create(['name' => $name, 'guard_name' => 'web']);
 
         if (! empty($permissions)) {
-            $role->syncPermissions($permissions);
+            $existingPermissions = Permission::query()
+                ->whereIn('name', $permissions)
+                ->pluck('name')
+                ->all();
+
+            $role->syncPermissions($existingPermissions);
         }
 
         return $role;

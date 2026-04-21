@@ -119,7 +119,7 @@ return [
          * The cache key used to store all permissions.
          */
 
-        'key' => 'spatie.permission.cache',
+        'key' => 'spatie.permission.cache.v2',
 
         /*
          * When checking for a permission against a model by passing a Permission
